@@ -74,11 +74,11 @@ $active_group = 'default';
 $query_builder = TRUE;
 
 $db['default'] = array(
-	'dsn'	=> '',
-	'hostname' => 'localhost',
-	'username' => '',
-	'password' => '',
-	'database' => '',
+	'dsn'	=> 'mysql',
+	'hostname' => 'auction-project.cz5uqo1ulns7.ap-southeast-1.rds.amazonaws.com',
+	'username' => 'admin',
+	'password' => 'raikage12345',
+	'database' => 'auction',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,

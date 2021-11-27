@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Home extends CI_Controller {
+class Product extends CI_Controller {
 
     public $firebaseConn;
 
@@ -9,23 +9,14 @@ class Home extends CI_Controller {
     {
             parent::__construct();
             $this->load->library('firebase');
-            $this->load->library('session');
+            $this->load->model('m_base');
+
 		    $firebaseConn = $this->firebase->init();
     }
 
 	public function index()
 	{
-        // $newdata = array( 
-        //     'username'  => 'johndoe', 
-        //     'email'     => 'johndoe@some-site.com', 
-        //     'logged_in' => TRUE
-        //  );  
-         
-        // $this->session->set_userdata($newdata);
-
-        $this->load->view('template/header_view.php');
-        $this->load->view('home.php');
-        $this->load->view('template/footer_view.php');
+  
 	}
 
     public function requestproduct()
@@ -33,6 +24,17 @@ class Home extends CI_Controller {
         
         $this->load->view('template/header_view.php');
         $this->load->view('request_product.php');
+        $this->load->view('template/footer_view.php');
+	}
+
+    public function myproduct()
+	{
+        $id = $this->session->userdata('id');
+
+        $product['data'] = $this->m_base->getDetail('product_bid', $id)->result_array();
+      
+        $this->load->view('template/header_view.php');
+        $this->load->view('my_product.php',$product);
         $this->load->view('template/footer_view.php');
 	}
 }

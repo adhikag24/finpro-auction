@@ -20,9 +20,7 @@ class Welcome extends CI_Controller {
 	 */
 	public function index()
 	{
-		$this->load->library('firebase');
-		$firebase = $this->firebase->init();
-		$db = $firebase->getDatabase();
+		echo "This is Welcome Page";
 
 	}
 }
