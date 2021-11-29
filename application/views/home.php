@@ -49,9 +49,9 @@
                                             0d 0h 0m 0s
                                         </div>
                                     </div>
-                                    <div class="mx-3 mt-3 mb-2"><button type="button" class="btn btn-danger btn-block"><small>
+                                    <div class="mx-3 mt-3 mb-2"><a href="<?=base_url()?>product/detail/${data[val].product_id}" type="button" class="btn btn-danger btn-block"><small>
                                                 Detail
-                                    </small></button></div>
+                                    </small></a></div>
                                     </div>
                                 </div>
                             </div>

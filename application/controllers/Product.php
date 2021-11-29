@@ -1,40 +1,48 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-class Product extends CI_Controller {
+class Product extends CI_Controller
+{
 
     public $firebaseConn;
 
     public function __construct()
     {
-            parent::__construct();
-            $this->load->library('firebase');
-            $this->load->model('m_base');
+        parent::__construct();
+        $this->load->library('firebase');
+        $this->load->model('m_base');
 
-		    $firebaseConn = $this->firebase->init();
+        $firebaseConn = $this->firebase->init();
     }
 
-	public function index()
-	{
-  
-	}
+    public function index()
+    {
+    }
 
     public function requestproduct()
-	{
-        
+    {
+
         $this->load->view('template/header_view.php');
         $this->load->view('request_product.php');
         $this->load->view('template/footer_view.php');
-	}
+    }
 
     public function myproduct()
-	{
+    {
         $id = $this->session->userdata('id');
 
         $product['data'] = $this->m_base->getDetail('product_bid', $id)->result_array();
-      
+
         $this->load->view('template/header_view.php');
-        $this->load->view('my_product.php',$product);
+        $this->load->view('my_product.php', $product);
         $this->load->view('template/footer_view.php');
-	}
+    }
+
+    public function detail($productId)
+    {
+        $data['id'] = $productId;
+        $this->load->view('template/header_view.php');
+        $this->load->view('detail_product.php', $data);
+        $this->load->view('template/footer_view.php');
+    }
 }

@@ -30,8 +30,9 @@ const productRef = ref(database, 'products/');
 
 export{
     app,
+    getDatabase,
     productRef,
-    ref,
     onValue,
     database,
+    ref
 }
