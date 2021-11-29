@@ -11,6 +11,7 @@
                         <th>Is Approved</th>
                         <th>Total Bidder</th>
                         <th>Highest Bid</th>
+                        <th>Image</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -19,15 +20,21 @@
                             <td><?= $i['name'] ?></td>
                             <td><?= $i['starting_price'] ?></td>
                             <td><?= $i['end_date'] ?></td>
-                            <td><?= $i['is_active'] ?></td>
-                            <td><?php if ($i['total_bidder'] == 1) : ?>
+                            <td><?php if ($i['is_active'] == 1) : ?>
                                     <span class="badge badge-success">Approved</span>
-                                <?php elseif ($i['total_bidder'] == 0) : ?>
+                                <?php elseif ($i['is_active'] === '0') : ?>
                                     <span class="badge badge-danger">Not Approved</span>
                                 <?php else : ?>
                                     <span class="badge badge-warning">Checking In Progress</span>
                                 <?php endif; ?>
                             </td>
+                            <td><?php if ($i['total_bidder'] == 0 || $i['total_bidder'] == null) : ?>
+                                    0
+                                <?php else : ?>
+                                    <?= $i['total_bidder'] ?>
+                                <?php endif; ?>
+                            </td>
+
                             
                             <td><?php if ($i['highest_bid'] == 0 || $i['highest_bid'] == null) : ?>
                                     0
@@ -35,6 +42,9 @@
                                     <?= $i['highest_bid'] ?>
                                 <?php endif; ?>
                             </td>
+
+                            <td> <img class="img" src="<?=$i['product_image']?>?alt=media" alt="" width="50" height="50"> </td>
+                           
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
