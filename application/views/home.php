@@ -64,7 +64,6 @@
         $('#productCardSection').html(html);
 
         $('[data-countdown]').each(function() {
-            console.log("hihiih");
             var $this = $(this),
                 finalDate = $(this).data('countdown');
 

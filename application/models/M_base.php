@@ -14,8 +14,18 @@ class M_base extends CI_Model {
         return $query;
     }
 
+    public function countWhere($table,$where){
+        $this->db->where($where);
+        $query = $this->db->get($table);
+        return $query->num_rows();
+    }
+
     public function getDetail($table, $id){
         $query = $this->db->get_where($table, array('user_id' => $id));
+        return $query;
+    }
+    public function getWhere($table, $where){
+        $query = $this->db->get_where($table, $where);
         return $query;
     }
 

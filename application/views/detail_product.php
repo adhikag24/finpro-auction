@@ -25,9 +25,9 @@
                         <div class="d-flex flex-row"> <i class='bx bxs-star'></i> <i class='bx bxs-star'></i> <i class='bx bxs-star'></i> <i class='bx bxs-star'></i> <i class='bx bx-star'></i> </div>Total Bidder:<span id="total_bidder"> </span>
                     </div>
                     <div class="mt-3">
-                        <vue-countdown :time="time" :interval="100" v-slot="{ days, hours, minutes, seconds }">
-                            Time Left: {{ days }}d {{ hours }}h {{ minutes }}m {{ seconds }}s
-                        </vue-countdown>
+                        <div id="countDownDiv" data-countdown="">
+                            
+                        </div>
                     </div>
                     <div class="buttons d-flex flex-row mt-5 gap-3">
                     <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
@@ -61,7 +61,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-dark" onclick="onBid()">Submit</button>
+                    <button type="button" class="btn btn-dark" id="submitBid" >Submit</button>
                 </div>
             </form>
     </div>
@@ -111,13 +111,67 @@
         $("#starting_price").html(data.initial_price);
         $("#highest_bid").html(data.highest_bid);
         $("#total_bidder").html(data.total_bidder);
+        $('#countDownDiv').data('countdown',data.end_date)
+
+        $('[data-countdown]').each(function() {
+            var $this = $(this),
+                finalDate = $(this).data('countdown');
+
+            var countDownDate = new Date(finalDate).getTime();
+
+            // Update the count down every 1 second
+            var x = setInterval(function() {
+
+                // Get today's date and time
+                var now = new Date().getTime();
+
+                // Find the distance between now and the count down date
+                var distance = countDownDate - now;
+
+                // Time calculations for days, hours, minutes and seconds
+                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                // Display the result in the element with id="demo"
+                $this.html(days + "d " + hours + "h " +
+                    minutes + "m " + seconds + "s ");
+
+                // If the count down is finished, write some text
+                if (distance < 0) {
+                    clearInterval(x);
+                    $this.html("EXPIRED");
+                }
+            }, 1000);
+        });
     });
 
     
 </script>
 
 <script>
-    function onBid(){
-        console.log("submit bid")
-    }
+    // function onBid(){
+    //     console.log("submit bid");
+    //     $.ajax({
+    //         type: 'GET',
+    //         url: <?=base_url()?>+'product/test',
+    //         success: function(data){
+    //             console.log('success',data);
+    //         }
+    //     });
+    // }
+    $(document).ready(function(){
+
+        $("#submitBid").click(function(){
+            var amount = $('#totalbid').val();
+            console.log("masuk",amount);
+            $.post("<?=base_url()?>product/test", {
+                amount: amount,
+                productId: <?=$id?>
+            },function(data,status){
+                console.log(data,status);
+            });
+        });
+    });
 </script>

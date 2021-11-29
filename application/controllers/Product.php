@@ -13,7 +13,7 @@ class Product extends CI_Controller
         $this->load->model('m_base');
         $this->load->library('form_validation');
 
-        $firebaseConn = $this->firebase->init();
+        $this->firebaseConn = $this->firebase->init();
     }
 
     public function index()
@@ -44,9 +44,9 @@ class Product extends CI_Controller
             $config['max_height']           = 0;
             $config['overwrite']            = FALSE;
             $config['remove_spaces']        = TRUE;
-            
+
             $this->load->library('upload', $config);
-    
+
 
             if ($this->form_validation->run() == false) {
                 $this->requestproduct();
@@ -60,13 +60,13 @@ class Product extends CI_Controller
                     $name = $_FILES['product_image']['name'];
 
 
-                    $uploadedfile = fopen('./assets/image/'.$name, 'r');
+                    $uploadedfile = fopen('./assets/image/' . $name, 'r');
 
-                    $uploadedName = $this->upload->data('raw_name').time().$this->upload->data('file_ext');
+                    $uploadedName = $this->upload->data('raw_name') . time() . $this->upload->data('file_ext');
 
                     $defaultBucket->getBucket()->upload($uploadedfile, ['name' =>  $uploadedName]);
 
-                    unlink('./assets/image/'.$name);
+                    unlink('./assets/image/' . $name);
 
                     $image_url = 'https://firebasestorage.googleapis.com/v0/b/auction-website-1cc67.appspot.com/o/' . $uploadedName;
 
@@ -103,9 +103,60 @@ class Product extends CI_Controller
 
     public function detail($productId)
     {
+        if ($this->session->userdata('is_login') != 1) {
+            redirect('auth/login');
+        }
         $data['id'] = $productId;
         $this->load->view('template/header_view.php');
         $this->load->view('detail_product.php', $data);
         $this->load->view('template/footer_view.php');
+    }
+
+    public function submitbid()
+    {
+        // $userid = $this->session->userdata('id');
+        // $post = $this->input->post();
+        // $where = [
+        //     'user_id' => $userid,
+        //     'product_id' => $post['productId']
+        // ];
+
+        // $alreadyBidProduct = $this->m_base->getWhere('bid', $where);
+        // if (empty($alreadyBidProduct->row())) {
+        //     $data = [
+        //         'user_id' => $userid,
+        //         'product_id' => $post['productId'],
+        //         'amount' => $post['amount']
+        //     ];
+
+        //     $this->m_base->insertTable('bid', $data);
+        // } else {
+        //     $data = array(
+        //         'amount' => $post['amount']
+        //     );
+
+        //     $this->db->where($where);
+        //     $this->db->update('bid', $data);
+        // }
+
+        // $count = $this->m_base->countWhere('bid',['product_id' => $post['productId']]);
+
+        // //update firebase
+        // $updates = [
+        //     'products/'.$post['product_id'].'/total_bidder' => $count,
+        //     'products/'.$post['product_id'].'/highest_bid' => $post['amount'],
+        // ];
+        $updates = [
+            'products/9/total_bidder' => "2",
+        ];
+        
+        
+        $db = $this->firebaseConn->getDatabase();
+        // $snapshot = $db->getSnapshot();
+        $value = $db->getReference('products')->getSnapshot();
+        
+        print_r($value);
+
+        // echo "Your amount" . $post['amount'];
     }
 }
