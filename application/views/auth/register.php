@@ -1,67 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Sign Up Newsfeed</title>
+<div class="container justify-content-center">
 
-    <!-- Font Icon -->
-    <link rel="stylesheet" href="<?=base_url()?>assets/auth_assets/fonts/material-icon/css/material-design-iconic-font.min.css">
+<div class="content">
+            <script>
+                $(function ()
+                {
+                    $("#wizard").steps({
+                        headerTag: "h2",
+                        bodyTag: "section",
+                        transitionEffect: "slideLeft"
+                    });
+                });
+            </script>
 
-    <!-- Main css -->
-    <link rel="stylesheet" href="<?=base_url()?>assets/auth_assets/css/style.css">
-</head>
-<body>
+            <div id="wizard" class="mt-3">
+                <h2>KYC Verification</h2>
+                <section>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer ut nulla nunc. Maecenas arcu sem, hendrerit a tempor quis, 
+                        sagittis accumsan tellus. In hac habitasse platea dictumst. Donec a semper dui. Nunc eget quam libero. Nam at felis metus. 
+                        Nam tellus dolor, tristique ac tempus nec, iaculis quis nisi.</p>
+                </section>
 
-    <div class="main">
+                <h2>Data Fullfilment</h2>
+                <section>
+                    <p>Donec mi sapien, hendrerit nec egestas a, rutrum vitae dolor. Nullam venenatis diam ac ligula elementum pellentesque. 
+                        In lobortis sollicitudin felis non eleifend. Morbi tristique tellus est, sed tempor elit. Morbi varius, nulla quis condimentum 
+                        dictum, nisi elit condimentum magna, nec venenatis urna quam in nisi. Integer hendrerit sapien a diam adipiscing consectetur. 
+                        In euismod augue ullamcorper leo dignissim quis elementum arcu porta. Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+                        Vestibulum leo velit, blandit ac tempor nec, ultrices id diam. Donec metus lacus, rhoncus sagittis iaculis nec, malesuada a diam. 
+                        Donec non pulvinar urna. Aliquam id velit lacus.</p>
+                </section>
 
-        <!-- Sign in form -->
-        <section class="signup">
-            <div class="container">
-                <div class="signup-content">
-                    <div class="signup-form">
-                        <h2 class="form-title">Sign up</h2>
-                        <form method="POST" action="<?=base_url()?>auth/register_process" class="register-form" id="register-form">
-                            <div class="form-group">
-                                <label for="name"><i class="zmdi zmdi-account material-icons-name"></i></label>
-                                <input type="text" name="name" id="name" placeholder="Your Name"/>
-                                <?= form_error('name', '<small class="text-danger pl-3">', '</small>') ?>
-                            </div>
-                            <div class="form-group">
-                                <label for="email"><i class="zmdi zmdi-email"></i></label>
-                                <input type="email" name="email" id="email" placeholder="Your Email"/>
-                                <?= form_error('email', '<small class="text-danger pl-3">', '</small>') ?>
-                            </div>
-                            <div class="form-group">
-                                <label for="pass"><i class="zmdi zmdi-lock"></i></label>
-                                <input type="password" name="password1" id="password1" placeholder="Password"/>
-                                <?= form_error('password1', '<small class="text-danger pl-3">', '</small>') ?>
-                            </div>
-                            <div class="form-group">
-                                <label for="re-pass"><i class="zmdi zmdi-lock-outline"></i></label>
-                                <input type="password" name="password2" id="password2" placeholder="Repeat your password"/>
-                            </div>
-                           
-                            <div class="form-group form-button">
-                                <input type="submit" name="signup" id="signup" class="form-submit" value="Register"/>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="signup-image">
-                        <figure><img src="<?=base_url()?>assets/image/other/logo.png" alt="sing up image"></figure>
-                        <a href="<?=base_url()?>auth/login" class="signup-image-link">I am already member</a>
-                    </div>
-                </div>
+              
+
+            
             </div>
-        </section>
-
-
-     
-    </div>
-
-    <!-- JS -->
-    <script src="<?=base_url()?>assets/auth_assets/vendor/jquery/jquery.min.js"></script>
-    <script src="<?=base_url()?>assets/auth_assets/js/main.js"></script>
-</body><!-- This templates was made by Colorlib (https://colorlib.com) -->
-</html>
+        </div>
+</div>

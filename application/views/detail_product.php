@@ -166,10 +166,15 @@
         $("#submitBid").click(function(){
             var amount = $('#totalbid').val();
             console.log("masuk",amount);
-            $.post("<?=base_url()?>product/test", {
+            $.post("<?=base_url()?>product/submitbid", {
                 amount: amount,
                 productId: <?=$id?>
             },function(data,status){
+                if(status == "success"){
+                    alert("Success Submit Bid");
+                }else{
+                    alert("Something Wrong Happen, Fail Submit Bid");
+                }
                 console.log(data,status);
             });
         });

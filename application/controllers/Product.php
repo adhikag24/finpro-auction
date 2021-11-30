@@ -114,49 +114,49 @@ class Product extends CI_Controller
 
     public function submitbid()
     {
-        // $userid = $this->session->userdata('id');
-        // $post = $this->input->post();
-        // $where = [
-        //     'user_id' => $userid,
-        //     'product_id' => $post['productId']
-        // ];
-
-        // $alreadyBidProduct = $this->m_base->getWhere('bid', $where);
-        // if (empty($alreadyBidProduct->row())) {
-        //     $data = [
-        //         'user_id' => $userid,
-        //         'product_id' => $post['productId'],
-        //         'amount' => $post['amount']
-        //     ];
-
-        //     $this->m_base->insertTable('bid', $data);
-        // } else {
-        //     $data = array(
-        //         'amount' => $post['amount']
-        //     );
-
-        //     $this->db->where($where);
-        //     $this->db->update('bid', $data);
-        // }
-
-        // $count = $this->m_base->countWhere('bid',['product_id' => $post['productId']]);
-
-        // //update firebase
-        // $updates = [
-        //     'products/'.$post['product_id'].'/total_bidder' => $count,
-        //     'products/'.$post['product_id'].'/highest_bid' => $post['amount'],
-        // ];
-        $updates = [
-            'products/9/total_bidder' => "2",
+        $userid = $this->session->userdata('id');
+        $post = $this->input->post();
+        $where = [
+            'user_id' => $userid,
+            'product_id' => $post['productId']
         ];
-        
+
+        $alreadyBidProduct = $this->m_base->getWhere('bid', $where);
+        if (empty($alreadyBidProduct->row())) {
+            $data = [
+                'user_id' => $userid,
+                'product_id' => $post['productId'],
+                'amount' => $post['amount']
+            ];
+
+            $this->m_base->insertTable('bid', $data);
+        } else {
+            $data = array(
+                'amount' => $post['amount']
+            );
+
+            $this->db->where($where);
+            $this->db->update('bid', $data);
+        }
+
+        $count = $this->m_base->countWhere('bid',['product_id' => $post['productId']]);
+
+        //update firebase
+        $updates = [
+            'products/'.$post['productId'].'/total_bidder' => $count,
+            'products/'.$post['productId'].'/highest_bid' => $post['amount'],
+        ];
+     
         
         $db = $this->firebaseConn->getDatabase();
-        // $snapshot = $db->getSnapshot();
-        $value = $db->getReference('products')->getSnapshot();
-        
-        print_r($value);
+        $db->getReference()->update($updates);
 
-        // echo "Your amount" . $post['amount'];
+        $response = [
+            'amount'    => $post['amount']
+        ];
+
+        $responseJson = json_encode($response);
+
+        echo $responseJson;
     }
 }
