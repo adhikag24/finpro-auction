@@ -15,12 +15,19 @@
                     </div>
                     <div class="form-group">
                         <label for="exampleInputPassword1">Your Picture</label>
-                        <div class="custom-file">
-                            <input type="file" class="custom-file-input" id="customFile">
-                            <label class="custom-file-label" for="customFile">Choose file</label>
-                        </div>
+                        <input class="form-control-file" type="file" name="file" id="file" id="formFile">
                     </div>
-                    <button type="submit" class="btn btn-success">Validate</button>
+
+                    <div class="form-group">
+                        <label for="exampleInputPassword1">Picture Example:</label><br>
+                        <img src="<?= base_url() ?>assets/image_example.jpg" alt="..." class="img-thumbnail" width="20%">
+                    </div>
+
+
+
+
+                    <button type="button" class="btn btn-success" id="validatebtn" onclick="validateKYC()">Validate</button>
+
                 </form>
             </section>
 
@@ -42,29 +49,58 @@
 </div>
 
 <script>
-    // $(function() {
-    //     $("#wizard").steps({
-    //         headerTag: "h2",
-    //         bodyTag: "section",
-    //         transitionEffect: "slideLeft"
-    //     });
-    // });
+    var isValidated = false;
+
     function formRule() {
         var form = $("#example-form");
         form.validate({
-            errorPlacement: function errorPlacement(error, element) { element.before(error); },
+            errorPlacement: function errorPlacement(error, element) {
+                element.before(error);
+            },
             rules: {
-                nik: "required",
-                date: "required"
+                nik: {
+                    required: true,
+                    minlength: 16
+                },
+                date: "required",
+                file: {
+                    required: true,
+                }
             },
             messages: {
-                "nik": "Please enter your NIK",
+                "nik": "Please enter your NIK (Min: 16)",
                 "date": "Please enter your Birth Date",
+                "file": "Please upload your Picture",
             }
         });
 
         return form;
     }
+
+    const validateKYC = () => {
+
+        var formValidate = formRule();
+        $("#validatebtn").html(`<i class="fa fa-spinner fa-spin"></i> Loading`)
+        $("#validatebtn").prop('disabled', true)
+
+        if (formValidate.valid()) {
+            var formId = $("#example-form");
+            var data = formId.serializeArray();
+
+            var formdata = new FormData();
+            jQuery.each($('#formFile')[0].files, function(i, file) {
+                formdata.append('image', file);
+            });
+
+            formdata.append('nik', data[0].value)
+            formdata.append('birthdate', data[1].value)
+
+        }
+
+
+        // isValidated = true;
+        // your function code here
+    };
 
 
 
@@ -76,7 +112,8 @@
             var form = formRule();
 
             form.validate().settings.ignore = ":disabled,:hidden";
-            return form.valid();
+            console.log("isValidated", isValidated);
+            return isValidated;
         },
         onFinishing: function(event, currentIndex) {
 
