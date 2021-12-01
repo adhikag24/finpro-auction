@@ -88,6 +88,165 @@ class Auth extends CI_Controller
     }
   }
 
+  public function kycverif()
+  {
+    $post = $this->input->post();
+    
+    $nik =  $post['nik'];
+    $file = $_FILES["image"];
+
+    $ageGender = $this->getAgeandGenderFromNIK($nik);
+    $resultCurl = $this->identifyImageGenderAndAge($file);
+
+    var_dump($resultCurl);
+    echo "masuk bos" .  $ageGender['age'] . $ageGender['gender'];
+  }
+
+  public function testCurl(){
+    echo $_FILES["file"]["name"];
+  }
+
+  public function identifyImageGenderAndAge($file)
+  {
+      /* API URL */
+      $url = 'http://localhost/finpro-auction/auth/testCurl';
+           
+      /* Init cURL resource */
+      $ch = curl_init($url);
+
+      $cfile = new CURLFile($file['tmp_name'], $file['type'], $file['name']);
+          
+      /* Array Parameter Data */
+      $data = ['file'=>$cfile];
+          
+      /* pass encoded JSON string to the POST fields */
+      curl_setopt($ch, CURLOPT_POST,1);
+      curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+         
+   
+      /* execute request */
+      $result = curl_exec($ch);
+         
+      /* close cURL resource */
+      curl_close($ch);
+
+      return $result;
+  }
+
+  public function getAgeandGenderFromNIK($nik){
+    $data = array();
+    $data['provinsi'] = substr($nik, 0, 2);
+    $data['kota'] = substr($nik, 2, 2);
+    $data['kecamatan'] = substr($nik, 4, 2);
+    $data['tanggal_lahir'] = substr($nik, 6, 2);
+    $data['bulan_lahir'] = substr($nik, 8, 2);
+    $data['tahun_lahir'] = substr($nik, 10, 2);
+    $data['unik'] = substr($nik, 12, 4);
+    if (intval($data['tanggal_lahir']) > 40) {
+      $data['tanggal_lahir_2'] = intval($data['tanggal_lahir']) - 40;
+      $gender = 'Wanita';
+    } else {
+      $data['tanggal_lahir_2'] = intval($data['tanggal_lahir']);
+      $gender = 'Pria';
+    }
+
+    if($data['tahun_lahir'] < 30){
+      $data['tahun_lahir'] = '20' . $data['tahun_lahir'];
+    }else{
+      $data['tahun_lahir'] = '19'.$data['tahun_lahir'];
+    }
+
+    $bornDate = sprintf("%s/%s/%s", $data['bulan_lahir'], $data['tanggal_lahir'], $data['tahun_lahir']);
+
+    $age = $this->countAge($bornDate);
+
+    $ageGender['age'] = $age;
+    $ageGender['gender'] = $gender;
+
+    return $ageGender;
+  }
+
+  public function countAge($birthDate)
+  {
+    // $birthDate = "12/17/1983";
+    //explode the date to get month, day and year
+    $birthDate = explode("/", $birthDate);
+    //get age from date or birthdate
+    $age = (date("md", date("U", mktime(0, 0, 0, $birthDate[0], $birthDate[1], $birthDate[2]))) > date("md")
+      ? ((date("Y") - $birthDate[2]) - 1)
+      : (date("Y") - $birthDate[2]));
+
+
+    return $age;
+  }
+
+  public function bulan($i)
+  {
+    $i = intval($i) - 1;
+    $data = array(
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember'
+    );
+    if (isset($data[$i])) {
+      return trim($data[$i]);
+    }
+    return '<span class="error">Invalid</span>';
+  }
+
+  public function kode_provinsi($i)
+  {
+    $i = intval($i);
+    $data = array(
+      11 => 'Aceh',
+      12 => 'Sumatera Utara',
+      13 => 'Sumatera Barat',
+      14 => 'Riau',
+      15 => 'Jambi',
+      16 => 'Sumatera Selatan',
+      17 => 'Bengkulu',
+      18 => 'Lampung',
+      19 => 'Kep. Bangka Belitung',
+      21 => 'Kep. Riau',
+      31 => 'DKI Jakarta',
+      32 => 'Jawa Barat',
+      33 => 'Jawa Tengah',
+      34 => 'Yogyakarta',
+      35 => 'Jawa Timur',
+      36 => 'Banten',
+      51 => 'Bali',
+      52 => 'Nusa Tenggara Barat',
+      53 => 'Nusa Tenggara Timur',
+      61 => 'Kalimantan Barat',
+      62 => 'Kalimantan Tengah',
+      63 => 'Kalimantan Selatan',
+      64 => 'Kalimantan Timur',
+      71 => 'Sulawesi Utara',
+      72 => 'Sulawesi Tengah',
+      73 => 'Sulawesi Selatan',
+      74 => 'Sulawesi Tenggara',
+      75 => 'Gorontalo',
+      76 => 'Sulawesi Barat',
+      81 => 'Maluku',
+      82 => 'Maluku Utara',
+      91 => 'Papua Barat',
+      94 => 'Papua'
+    );
+    if (isset($data[$i])) {
+      return trim($data[$i]);
+    }
+    return '<span class="error">Invalid</span>';
+  }
 
 
   public function logout()

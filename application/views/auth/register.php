@@ -15,7 +15,7 @@
                     </div>
                     <div class="form-group">
                         <label for="exampleInputPassword1">Your Picture</label>
-                        <input class="form-control-file" type="file" name="file" id="file" id="formFile">
+                        <input class="form-control-file" type="file" name="file" id="formFile">
                     </div>
 
                     <div class="form-group">
@@ -80,10 +80,12 @@
     const validateKYC = () => {
 
         var formValidate = formRule();
-        $("#validatebtn").html(`<i class="fa fa-spinner fa-spin"></i> Loading`)
-        $("#validatebtn").prop('disabled', true)
+
 
         if (formValidate.valid()) {
+            // $("#validatebtn").html(`<i class="fa fa-spinner fa-spin"></i> Loading`)
+            // $("#validatebtn").prop('disabled', true)
+
             var formId = $("#example-form");
             var data = formId.serializeArray();
 
@@ -94,6 +96,18 @@
 
             formdata.append('nik', data[0].value)
             formdata.append('birthdate', data[1].value)
+
+            $.ajax({
+                url: "<?= base_url() ?>auth/kycverif",
+                type: "POST",
+                data: formdata,
+                success: function(msg) {
+                    alert(msg)
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
 
         }
 
@@ -113,6 +127,11 @@
 
             form.validate().settings.ignore = ":disabled,:hidden";
             console.log("isValidated", isValidated);
+
+            if (!isValidated) {
+                alert("You have to pass the KYC Verification Process.")
+            }
+
             return isValidated;
         },
         onFinishing: function(event, currentIndex) {
