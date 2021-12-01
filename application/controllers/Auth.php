@@ -91,50 +91,76 @@ class Auth extends CI_Controller
   public function kycverif()
   {
     $post = $this->input->post();
-    
+
     $nik =  $post['nik'];
+    $birthDateInput =  $post['birthdate'];
     $file = $_FILES["image"];
 
-    $ageGender = $this->getAgeandGenderFromNIK($nik);
+    $dataNIK = $this->getAgeandGenderFromNIK($nik);
     $resultCurl = $this->identifyImageGenderAndAge($file);
+    $response = json_decode($resultCurl, true);
+    $ageRange = array();
+    foreach ($response as $result) {
+      $result['age'] = substr($result['age'], 1, -1);
+      $numArr =  explode("-", $result['age']);
+      array_push($ageRange, $numArr[0], $numArr[1]);
+    }
+    $minRange = min($ageRange);
+    $maxRange = max($ageRange);
 
-    var_dump($resultCurl);
-    echo "masuk bos" .  $ageGender['age'] . $ageGender['gender'];
+    $imageGender = $response[0]['gender'];
+    $isUserVerified = $this->verifyUser($dataNIK['age'], $dataNIK['birthdate'], $birthDateInput, $minRange, $maxRange, $dataNIK['gender'], $imageGender);
+
+    var_dump($isUserVerified);
   }
 
-  public function testCurl(){
-    echo $_FILES["file"]["name"];
+  public function verifyUser($age, $birthDateNIK, $birthDateInput, $min, $max, $genderNIK, $genderImage)
+  {
+    if (($min <= $age) && ($max <= $age)) {
+      if (($birthDateNIK == $birthDateInput) && ($genderNIK == $genderImage)) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
+
+
 
   public function identifyImageGenderAndAge($file)
   {
-      /* API URL */
-      $url = 'http://localhost/finpro-auction/auth/testCurl';
-           
-      /* Init cURL resource */
-      $ch = curl_init($url);
+    /* API URL */
+    $url = 'http://127.0.0.1:5000/validate-kyc';
 
-      $cfile = new CURLFile($file['tmp_name'], $file['type'], $file['name']);
-          
-      /* Array Parameter Data */
-      $data = ['file'=>$cfile];
-          
-      /* pass encoded JSON string to the POST fields */
-      curl_setopt($ch, CURLOPT_POST,1);
-      curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-         
-   
-      /* execute request */
-      $result = curl_exec($ch);
-         
-      /* close cURL resource */
-      curl_close($ch);
+    /* Init cURL resource */
+    $ch = curl_init($url);
 
-      return $result;
+    $cfile = new CURLFile($file['tmp_name'], $file['type'], $file['name']);
+
+    /* Array Parameter Data */
+    $data = ['imagefile' => $cfile];
+
+    /* pass encoded JSON string to the POST fields */
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+
+    /* execute request */
+    $result = curl_exec($ch);
+
+
+
+    /* close cURL resource */
+    curl_close($ch);
+
+    return $result;
   }
 
-  public function getAgeandGenderFromNIK($nik){
+  public function getAgeandGenderFromNIK($nik)
+  {
     $data = array();
     $data['provinsi'] = substr($nik, 0, 2);
     $data['kota'] = substr($nik, 2, 2);
@@ -145,16 +171,16 @@ class Auth extends CI_Controller
     $data['unik'] = substr($nik, 12, 4);
     if (intval($data['tanggal_lahir']) > 40) {
       $data['tanggal_lahir_2'] = intval($data['tanggal_lahir']) - 40;
-      $gender = 'Wanita';
+      $gender = 'Female';
     } else {
       $data['tanggal_lahir_2'] = intval($data['tanggal_lahir']);
-      $gender = 'Pria';
+      $gender = 'Male';
     }
 
-    if($data['tahun_lahir'] < 30){
+    if ($data['tahun_lahir'] < 30) {
       $data['tahun_lahir'] = '20' . $data['tahun_lahir'];
-    }else{
-      $data['tahun_lahir'] = '19'.$data['tahun_lahir'];
+    } else {
+      $data['tahun_lahir'] = '19' . $data['tahun_lahir'];
     }
 
     $bornDate = sprintf("%s/%s/%s", $data['bulan_lahir'], $data['tanggal_lahir'], $data['tahun_lahir']);
@@ -163,6 +189,7 @@ class Auth extends CI_Controller
 
     $ageGender['age'] = $age;
     $ageGender['gender'] = $gender;
+    $ageGender['birthdate'] = sprintf("%s-%s-%s", $data['tahun_lahir'], $data['bulan_lahir'], $data['tanggal_lahir']);
 
     return $ageGender;
   }
