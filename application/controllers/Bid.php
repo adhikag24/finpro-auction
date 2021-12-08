@@ -30,4 +30,8 @@ class Bid extends CI_Controller {
         $this->load->view('my_bid.php',$bid);
         $this->load->view('template/footer_view.php');
 	}
+
+    public function syncbidwinner(){
+        echo "hi";
+    }
 }

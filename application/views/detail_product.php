@@ -3,10 +3,10 @@
         <div class="row g-0">
             <div class="col-md-6 border-end">
                 <div class="d-flex flex-column justify-content-center">
-                    <div class="main_image"> <img :src="product.product_images" id="main_product_image" width="350"> </div>
+                    <div class="main_image"> <img src="" id="main_product_image" width="350"> </div>
                     <div class="thumbnail_images">
                         <ul id="thumbnail">
-                            <img src="" width="70">
+                            <img  src="" width="70">
                         </ul>
                     </div>
                 </div>
@@ -107,6 +107,7 @@
         var data = snapshot.val();
         console.log(data);
         console.log(data.product_name);
+        $("#main_product_image").attr('src',data.product_images[0]);   
         $("#product_name").html(data.product_name);
         $("#starting_price").html(data.initial_price);
         $("#highest_bid").html(data.highest_bid);

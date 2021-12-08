@@ -19,9 +19,19 @@
         var data = snapshot.val();
         var html = "";
         for (var val in data) {
-            console.log(val);
 
-            html += `
+            var today = new Date();
+            var dd = String(today.getDate()).padStart(2, '0');
+            var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var yyyy = today.getFullYear();
+            today = yyyy + '-' +  mm + '-' + dd;
+
+            var d1 = Date.parse(data[val].end_date);
+            var d2 = Date.parse(today);
+
+
+            if (d1 < d2){//jika end date belum melewati hari ini
+                html += `
                 <div class="col-sm-3" >
                     <div class="card"> <img src="https://i.imgur.com/z55ax9e.jpeg" class="card-img-top img-fluid img-thumbnail" width="100%">
                                 <div class="card-body pt-0 px-0">
@@ -44,19 +54,21 @@
                                         </div>
                                     </div>
                                     <div class="d-flex flex-row justify-content-between px-3 pb-2">
-                                        <div class="d-flex flex-column"><span class="text-muted">Time Left:</span></div>
+                                        <div class="d-flex flex-column"><span class="text-muted">Status:</span></div>
                                         <div class="d-flex flex-column" data-countdown="${data[val].end_date}">
                                             0d 0h 0m 0s
                                         </div>
                                     </div>
-                                    <div class="mx-3 mt-3 mb-2"><a href="<?=base_url()?>product/detail/${data[val].product_id}" type="button" class="btn btn-danger btn-block"><small>
-                                                Detail
+                                    <div class="mx-2 mt-3 mb-2"><a href="#" type="button" class="btn btn-info btn-block"><small>
+                                                Bid Winner, still in checking process.
                                     </small></a></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     `;
+            }
+
 
         }
 
@@ -91,7 +103,7 @@
                 // If the count down is finished, write some text
                 if (distance < 0) {
                     clearInterval(x);
-                    $this.html("EXPIRED");
+                    $this.html("Bid Is Finished");
                 }
             }, 1000);
         });
