@@ -16,6 +16,12 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.min.js"></script>
 
+
+    <!-- Date Range Picker -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- Jquery Validate -->
@@ -29,20 +35,32 @@
 
     <div id="nav">
         <nav class="container navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="#">Logo Here</a>
+            <a class="navbar-brand" href="<?php echo base_url(); ?>">Logo Here</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
+
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <div class="navbar-nav me-auto">
                     <!-- <router-link to="/" class="nav-item nav-link">Home</router-link> -->
                     <!-- <router-link to="my-bid" class="nav-item nav-link">My Bid</router-link> -->
                 </div>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= base_url() ?>">Ongoing Bid</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= base_url() ?>home/upcomingbid">Upcoming Bid</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" href="<?= base_url() ?>home/finishedbid">Finished Bid</a>
+                    </li>
+                </ul>
                 <div class="container">
                     <div class="row height d-flex justify-content-center align-items-center">
-                        <div class="col-md-8">
+                        <!-- <div class="col-md-8">
                             <div class="search"> <i class="fa fa-search"></i> <input type="text" class="form-control" placeholder="Looking For Some Product?"> <button class="btn btn-default"><span class="text-white">Search</span></button> </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
                 <div class="d-flex flex-row bd-highlight mb-3">

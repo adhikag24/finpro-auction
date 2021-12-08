@@ -7,6 +7,7 @@
                     <tr>
                         <th>Name</th>
                         <th>Starting Price</th>
+                        <th>Start Date</th>
                         <th>End Date</th>
                         <th>Is Approved</th>
                         <th>Total Bidder</th>
@@ -19,6 +20,7 @@
                         <tr>
                             <td><?= $i['name'] ?></td>
                             <td><?= $i['starting_price'] ?></td>
+                            <td><?= $i['start_date'] ?></td>
                             <td><?= $i['end_date'] ?></td>
                             <td><?php if ($i['is_active'] == 1) : ?>
                                     <span class="badge badge-success">Approved</span>
@@ -54,6 +56,8 @@
 </div>
 <script>
     $(document).ready(function() {
-        $('#table_id').DataTable();
+        $('#table_id').DataTable({
+            "ordering": false
+        });
     });
 </script>

@@ -43,6 +43,21 @@ class M_base extends CI_Model {
     }
 
 
+    public function getOneToManyBid($table1, $table2, $connection1, $connection2, $condition = null){
+        $this->db->select('*');
+        $this->db->from($table1);
+        if(isset($where)){
+        $this->db->where($condition);
+        }
+        $this->db->join($table2, $table2.'.'.$connection2 .'='. $table1.'.'.$connection1);
+        $this->db->join('user', 'user.id' .'='. 'bid.user_id');
+        $query = $this->db->get();
+
+        return $query;
+
+    }
+
+
     
 
 }

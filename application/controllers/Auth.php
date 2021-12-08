@@ -11,7 +11,9 @@ class Auth extends CI_Controller
     parent::__construct();
     $this->load->library('form_validation');
     $this->load->model('m_auth');
+    $this->load->model('m_base');
   }
+
 
   public function registration()
   {
@@ -74,6 +76,7 @@ class Auth extends CI_Controller
           'name'     => $validate['user_name'],
           'email'     => $validate['user_email'],
           'id'     => $validate['id'],
+          'role'  => $validate['role'],
           'is_login'  => 1
         ];
 
@@ -93,25 +96,59 @@ class Auth extends CI_Controller
     $post = $this->input->post();
 
     $nik =  $post['nik'];
-    $birthDateInput =  $post['birthdate'];
-    $file = $_FILES["image"];
+    $where = ['nik' => $nik];
+    $cekNik = $this->m_base->countWhere('user',$where);
+    $jsonResponse = '';
 
-    $dataNIK = $this->getAgeandGenderFromNIK($nik);
-    $resultCurl = $this->identifyImageGenderAndAge($file);
-    $response = json_decode($resultCurl, true);
-    $ageRange = array();
-    foreach ($response as $result) {
-      $result['age'] = substr($result['age'], 1, -1);
-      $numArr =  explode("-", $result['age']);
-      array_push($ageRange, $numArr[0], $numArr[1]);
+    if($cekNik > 0){
+      $response['data'] = false;
+      $response['message'] = 'Maaf NIK sudah terdaftar.';
+      $jsonResponse = json_encode($response);
+    }else{
+      $birthDateInput =  $post['birthdate'];
+      $file = $_FILES["image"];
+  
+      $dataNIK = $this->getAgeandGenderFromNIK($nik);
+      $resultCurl = $this->identifyImageGenderAndAge($file);
+      $responseCurl = json_decode($resultCurl, true);
+      $ageRange = array();
+      foreach ($responseCurl as $result) {
+        $result['age'] = substr($result['age'], 1, -1);
+        $numArr =  explode("-", $result['age']);
+        array_push($ageRange, $numArr[0], $numArr[1]);
+      }
+      $minRange = min($ageRange);
+      $maxRange = max($ageRange);
+  
+      $imageGender = $responseCurl[0]['gender'];
+      $isUserVerified = $this->verifyUser($dataNIK['age'], $dataNIK['birthdate'], $birthDateInput, $minRange, $maxRange, $dataNIK['gender'], $imageGender);
+  
+  
+      $response['data'] = $isUserVerified;
+      $response['message'] = $isUserVerified ? 'Selamat anda telah terverifikasi, dan dapat lanjut ke proses selanjutnya.' : 'Maaf anda belum terverifikasi, pastikan NIK, Tanggal Lahir benar, dan juga foto selfie yang jelas dan terang.';
+  
+      $jsonResponse = json_encode($response);
     }
-    $minRange = min($ageRange);
-    $maxRange = max($ageRange);
 
-    $imageGender = $response[0]['gender'];
-    $isUserVerified = $this->verifyUser($dataNIK['age'], $dataNIK['birthdate'], $birthDateInput, $minRange, $maxRange, $dataNIK['gender'], $imageGender);
+    echo $jsonResponse;
+  
+  }
 
-    var_dump($isUserVerified);
+  public function registerprocess()
+  {
+    $post = $this->input->post();
+
+    $data = [
+      'user_name' => $post['name'],
+      'user_email' => $post['email'],
+      'user_password' => md5($post['password']),
+      'nik' => $post['nik'],
+      'role' => 0,
+    ];
+
+    $this->m_base->insertTable('user', $data);
+
+    echo "success";
   }
 
   public function verifyUser($age, $birthDateNIK, $birthDateInput, $min, $max, $genderNIK, $genderImage)

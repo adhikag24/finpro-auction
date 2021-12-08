@@ -9,6 +9,9 @@ class Product extends CI_Controller
     public function __construct()
     {
         parent::__construct();
+        if ($this->session->userdata('is_login') != 1) {
+            redirect('auth/login');
+        }
         $this->load->library('firebase');
         $this->load->model('m_base');
         $this->load->library('form_validation');
@@ -32,9 +35,10 @@ class Product extends CI_Controller
     {
         $post = $this->input->post();
 
+
         $this->form_validation->set_rules('product_name', 'Product Name', 'required|trim');
         $this->form_validation->set_rules('starting_price', 'Starting Price', 'required|trim');
-        $this->form_validation->set_rules('end_date', 'End Date', 'required|trim');
+        $this->form_validation->set_rules('daterange', 'End Date', 'required|trim');
 
         if (!empty($_FILES['product_image']['name'])) {
             $config['upload_path']          = './assets/image';
@@ -70,10 +74,16 @@ class Product extends CI_Controller
 
                     $image_url = 'https://firebasestorage.googleapis.com/v0/b/auction-website-1cc67.appspot.com/o/' . $uploadedName;
 
+
+                    $daterange = explode('-', $post['daterange']);
+                    $startDate = date("Y-m-d", strtotime($daterange[0]));
+                    $endDate = date("Y-m-d", strtotime($daterange[1]));
+                 
                     $data = array(
                         'name' => $post['product_name'],
                         'starting_price' => $post['starting_price'],
-                        'end_date' => $post['end_date'],
+                        'start_date' => $startDate,
+                        'end_date' => $endDate,
                         'user_id' => $this->session->userdata('id'),
                         'product_image'  => $image_url,
                     );
@@ -94,10 +104,15 @@ class Product extends CI_Controller
     {
         $id = $this->session->userdata('id');
 
-        $product['data'] = $this->m_base->getDetail('product_bid', $id)->result_array();
+        $product = $this->m_base->getDetail('product_bid', $id)->result_array();
+        // echo "<pre>";
+        // print_r($product);
+        $data['data'] = array_reverse($product);
+        // print_r($data);
+        // echo "</pre>";
 
         $this->load->view('template/header_view.php');
-        $this->load->view('my_product.php', $product);
+        $this->load->view('my_product.php', $data);
         $this->load->view('template/footer_view.php');
     }
 
@@ -139,15 +154,15 @@ class Product extends CI_Controller
             $this->db->update('bid', $data);
         }
 
-        $count = $this->m_base->countWhere('bid',['product_id' => $post['productId']]);
+        $count = $this->m_base->countWhere('bid', ['product_id' => $post['productId']]);
 
         //update firebase
         $updates = [
-            'products/'.$post['productId'].'/total_bidder' => $count,
-            'products/'.$post['productId'].'/highest_bid' => $post['amount'],
+            'products/' . $post['productId'] . '/total_bidder' => $count,
+            'products/' . $post['productId'] . '/highest_bid' => $post['amount'],
         ];
-     
-        
+
+
         $db = $this->firebaseConn->getDatabase();
         $db->getReference()->update($updates);
 
