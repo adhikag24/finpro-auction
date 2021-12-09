@@ -97,17 +97,17 @@ class Auth extends CI_Controller
 
     $nik =  $post['nik'];
     $where = ['nik' => $nik];
-    $cekNik = $this->m_base->countWhere('user',$where);
+    $cekNik = $this->m_base->countWhere('user', $where);
     $jsonResponse = '';
 
-    if($cekNik > 0){
+    if ($cekNik > 0) {
       $response['data'] = false;
       $response['message'] = 'Maaf NIK sudah terdaftar.';
       $jsonResponse = json_encode($response);
-    }else{
+    } else {
       $birthDateInput =  $post['birthdate'];
       $file = $_FILES["image"];
-  
+
       $dataNIK = $this->getAgeandGenderFromNIK($nik);
       $resultCurl = $this->identifyImageGenderAndAge($file);
       $responseCurl = json_decode($resultCurl, true);
@@ -119,19 +119,18 @@ class Auth extends CI_Controller
       }
       $minRange = min($ageRange);
       $maxRange = max($ageRange);
-  
+
       $imageGender = $responseCurl[0]['gender'];
       $isUserVerified = $this->verifyUser($dataNIK['age'], $dataNIK['birthdate'], $birthDateInput, $minRange, $maxRange, $dataNIK['gender'], $imageGender);
-  
-  
+
+
       $response['data'] = $isUserVerified;
       $response['message'] = $isUserVerified ? 'Selamat anda telah terverifikasi, dan dapat lanjut ke proses selanjutnya.' : 'Maaf anda belum terverifikasi, pastikan NIK, Tanggal Lahir benar, dan juga foto selfie yang jelas dan terang.';
-  
+
       $jsonResponse = json_encode($response);
     }
 
     echo $jsonResponse;
-  
   }
 
   public function registerprocess()

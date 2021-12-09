@@ -53,7 +53,7 @@
                         <a class="nav-link" href="<?= base_url() ?>home/upcomingbid">Upcoming Bid</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link disabled" href="<?= base_url() ?>home/finishedbid">Finished Bid</a>
+                        <a class="nav-link" href="<?= base_url() ?>home/finishedbid">Finished Bid</a>
                     </li>
                 </ul>
                 <div class="container">

@@ -40,7 +40,6 @@ class Bid extends CI_Controller
                 $bidData = $this->m_base->getWhere('bid', ['product_id' => $product['id']])->result_array();
                 foreach ($bidData as $bid) {
                     if ($bid['amount'] == $product['highest_bid']) {
-                        echo "Winner " . $bid['user_id'];
                         $check = $this->m_base->countWhere('bid_winner', ['product_id' => $product['id'], 'user_id' => $bid['user_id']]);
                         if ($check == 0) {
                             $data = [
