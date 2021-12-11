@@ -29,7 +29,7 @@
                         <div class="card-header">
                             <h5 class="m-0 text-dark">Product List
                                 <div class="float-right">
-                                    <a href="<?= base_url() ?>admin/create_news"  onclick="return confirm('This Button will run function to validate all bid winner and send the notification. Are you sure?');" class="btn btn-sm btn-warning"><i class="fa fa-sync"></i> Validate Products</a>
+                                    <a href="<?= base_url() ?>admin/syncproductbid"  onclick="return confirm('This Button will run function to validate all bid winner and send the notification. Are you sure?');" class="btn btn-sm btn-warning"><i class="fa fa-sync"></i> Validate Products</a>
                                 </div>
                             </h5>
 

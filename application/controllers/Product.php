@@ -174,4 +174,6 @@ class Product extends CI_Controller
 
         echo $responseJson;
     }
+
+  
 }

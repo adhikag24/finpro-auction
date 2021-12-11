@@ -45,6 +45,10 @@ class Admin extends CI_Controller {
 		$this->load->view('admin/template/footer');
 	}
 
+    public function syncproductbid(){
+        echo "hi";
+    }
+
 	public function create_news()
 	{
 		$this->load->view('admin/template/header');
