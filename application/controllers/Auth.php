@@ -95,33 +95,37 @@ class Auth extends CI_Controller
   {
     $post = $this->input->post();
 
-    $nik =  $post['nik'];
-    $where = ['nik' => $nik];
-    $cekNik = $this->m_base->countWhere('user', $where);
+    $nim =  $post['nim'];
+    $fullname =  $post['fullname'];
+    $where = ['nim' => $nim];
+    $ceknim = $this->m_base->countWhere('user', $where);
     $jsonResponse = '';
 
-    if ($cekNik > 0) {
+    if ($ceknim > 0) {
       $response['data'] = false;
-      $response['message'] = 'Maaf NIK sudah terdaftar.';
+      $response['message'] = 'Maaf NIM sudah terdaftar.';
       $jsonResponse = json_encode($response);
     } else {
-      $birthDateInput =  $post['birthdate'];
-      $file = $_FILES["image"];
+      echo $fullname;
+      echo $nim;
+      $isUserVerified = $this->checkIfMahasiswaExist($fullname, $nim);
+      // $birthDateInput =  $post['birthdate'];
+      // $file = $_FILES["image"];
 
-      $dataNIK = $this->getAgeandGenderFromNIK($nik);
-      $resultCurl = $this->identifyImageGenderAndAge($file);
-      $responseCurl = json_decode($resultCurl, true);
-      $ageRange = array();
-      foreach ($responseCurl as $result) {
-        $result['age'] = substr($result['age'], 1, -1);
-        $numArr =  explode("-", $result['age']);
-        array_push($ageRange, $numArr[0], $numArr[1]);
-      }
-      $minRange = min($ageRange);
-      $maxRange = max($ageRange);
+      // $dataNIK = $this->getAgeandGenderFromNIK($nik);
+      // $resultCurl = $this->identifyImageGenderAndAge($file);
+      // $responseCurl = json_decode($resultCurl, true);
+      // $ageRange = array();
+      // foreach ($responseCurl as $result) {
+        // $result['age'] = substr($result['age'], 1, -1);
+        // $numArr =  explode("-", $result['age']);
+        // array_push($ageRange, $numArr[0], $numArr[1]);
+      // }
+      // $minRange = min($ageRange);
+      // $maxRange = max($ageRange);
 
-      $imageGender = $responseCurl[0]['gender'];
-      $isUserVerified = $this->verifyUser($dataNIK['age'], $dataNIK['birthdate'], $birthDateInput, $minRange, $maxRange, $dataNIK['gender'], $imageGender);
+      // $imageGender = $responseCurl[0]['gender'];
+      // $isUserVerified = $this->verifyUser($dataNIK['age'], $dataNIK['birthdate'], $birthDateInput, $minRange, $maxRange, $dataNIK['gender'], $imageGender);
 
 
       $response['data'] = $isUserVerified;
@@ -131,6 +135,54 @@ class Auth extends CI_Controller
     }
 
     echo $jsonResponse;
+  }
+
+  public function checkIfMahasiswaExist($name,$nim)
+  {
+    $equalTo = sprintf("%s(%s)", strtoupper($name), $nim);
+    echo $equalTo;
+    $query = str_replace(" ", "%20", $name);
+    $result = $this->curlDataMahasiswa($query);
+    $data = json_decode($result, true);
+    $data = $data['mahasiswa'];
+
+
+    foreach ($data as $i) {
+      $dataMhs = explode(",", $i['text']);
+      if ($equalTo == $dataMhs[0]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public function curlDataMahasiswa($query)
+  {
+    /* API URL */
+    $url = 'https://api-frontend.kemdikbud.go.id/hit_mhs/' . $query;
+
+    /* Init cURL resource */
+    $ch = curl_init();
+
+
+    /* Array Parameter Data */
+
+    /* pass encoded JSON string to the POST fields */
+    curl_setopt($ch, CURLOPT_URL, $url);
+
+    // return the transfer as a string 
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+
+    /* execute request */
+    $result = curl_exec($ch);
+
+
+
+    /* close cURL resource */
+    curl_close($ch);
+
+    return $result;
   }
 
   public function registerprocess()
