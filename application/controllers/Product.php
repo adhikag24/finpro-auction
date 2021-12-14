@@ -78,7 +78,7 @@ class Product extends CI_Controller
                     $daterange = explode('-', $post['daterange']);
                     $startDate = date("Y-m-d", strtotime($daterange[0]));
                     $endDate = date("Y-m-d", strtotime($daterange[1]));
-                 
+
                     $data = array(
                         'name' => $post['product_name'],
                         'starting_price' => $post['starting_price'],
@@ -127,10 +127,119 @@ class Product extends CI_Controller
         $this->load->view('template/footer_view.php');
     }
 
+    public function syncproductbid()
+    {
+        $where = [
+            'is_active' => 0,
+            'is_validated' => 0
+        ];
+        $products = $this->db->get_where('product_bid', $where)->result_array();
+
+        foreach ($products as $product) {
+            $resultCurl = $this->identifyBlurandObject($product['product_image']);
+            $resultCurl = json_decode($resultCurl, true);
+
+            $userData = $this->db->get_where('user', ['id'  => $product['user_id']])->row_array();
+
+            if ($resultCurl['is_approved']) {
+               
+                //send notification
+                $dataEmail = [
+                    'to'    => $userData['user_email'],
+                    'subject'   => 'Congratulations!, your product was validated and will be activated to the market.',
+                    'body'      => sprintf("Hi %s, congratulations your product (%s), will go market at %s.", $userData['user_name'], $product['name'], $product['start_date'])
+                ];
+
+                $this->m_base->sendemail($dataEmail['to'], $dataEmail['subject'], $dataEmail['body']);
+
+                $changes = [
+                    'is_active' => 1,
+                    'is_validated' => 1
+                ];
+
+                $this->db->where('id', $product['id']);
+                $this->db->update('product_bid', $changes);
+
+                $firebaseProduct = [
+                    "end_date" => $product['end_date'],
+                    "start_date" => $product['start_date'],
+                    "highest_bid" => 0,
+                    "initial_price" => $product['starting_price'],
+                    "product_id" => $product['id'],
+                    "product_images" => $product['product_image'],
+                    "product_name" => $product['name'],
+                    "total_bidder" => 0
+                ];
+                
+                $this->insertfirebase($firebaseProduct);
+
+            } else {
+                $dataEmail = [
+                    'to'    => $userData['user_email'],
+                    'subject'   => 'Unfortunately!, your product was not validated.',
+                    'body'      =>  sprintf("Hi %s, unfortunately your product (%s), was not validated. \n Please makesure your product image fullfill, requirement below: \n <ul> <li>Picture not blurry.</li> <li>Product Object is clear.</li> <li>Enough Brightness</li> </ul>", $userData['user_name'], $product['name'])
+                ];
+
+                $this->m_base->sendemail($dataEmail['to'], $dataEmail['subject'], $dataEmail['body']);
+
+                $changes = [
+                    'is_validated' => 1
+                ];
+
+                $this->db->where('id', $product['id']);
+                $this->db->update('product_bid', $changes);
+            }
+        }
+
+        $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">
+					Done! syncronize product data.
+					</div>');
+
+        redirect(base_url('admin/product'));
+    }
+
+    public function insertfirebase($data)
+    {
+        $db = $this->firebaseConn->getDatabase();
+        $db->getReference('/products')->push($data);
+    }
+
+
+    public function identifyBlurandObject($imageurl)
+    {
+        /* API URL */
+        $url = 'http://127.0.0.1:5000/validate-image';
+
+        /* Init cURL resource */
+        $ch = curl_init($url);
+
+
+        /* Array Parameter Data */
+        $data = ['image' => $imageurl];
+
+        /* pass encoded JSON string to the POST fields */
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+
+        /* execute request */
+        $result = curl_exec($ch);
+
+
+
+        /* close cURL resource */
+        curl_close($ch);
+
+        return $result;
+    }
+
+
     public function submitbid()
     {
         $userid = $this->session->userdata('id');
         $post = $this->input->post();
+     
         $where = [
             'user_id' => $userid,
             'product_id' => $post['productId']
@@ -158,13 +267,21 @@ class Product extends CI_Controller
 
         //update firebase
         $updates = [
-            'products/' . $post['productId'] . '/total_bidder' => $count,
-            'products/' . $post['productId'] . '/highest_bid' => $post['amount'],
+            'products/' . $post['productfbId'] . '/total_bidder' => $count,
+            'products/' . $post['productfbId'] . '/highest_bid' => $post['amount'],
         ];
 
 
         $db = $this->firebaseConn->getDatabase();
         $db->getReference()->update($updates);
+
+        $productupdatedata = array(
+            'highest_bid' => $post['amount'],
+            'total_bidder' => $count
+        );
+
+        $this->db->where(['id' => $post['productId']]);
+        $this->db->update('product_bid', $productupdatedata);
 
         $response = [
             'amount'    => $post['amount']
@@ -174,6 +291,4 @@ class Product extends CI_Controller
 
         echo $responseJson;
     }
-
-  
 }

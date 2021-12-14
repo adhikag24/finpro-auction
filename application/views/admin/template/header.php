@@ -180,6 +180,15 @@
               </p>
             </a>
           </li>
+
+          <li class="nav-item">
+          <a href="<?= base_url() ?>admin/bidwinner" class="nav-link <?=($current_page == 'bidwinner') ? 'active' : ''?>">
+              <i class="nav-icon fas fa-hand-holding-usd"></i>
+              <p>
+              Bid Winner
+              </p>
+            </a>
+          </li>
       
           <li class="nav-item">
           <a href="<?= base_url() ?>auth/logout" class="nav-link">

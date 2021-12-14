@@ -37,6 +37,8 @@ class Admin extends CI_Controller {
 	{
         // $data['newsData'] = $this->m_news->getNewsData();
         $data['data'] = $this->m_base->getOneToManyBid('bid', 'product_bid', 'product_id', 'id')->result_array();
+        $data['data'] = array_reverse($data['data']);
+
         // print_r($data);
         // die;
         
@@ -45,9 +47,26 @@ class Admin extends CI_Controller {
 		$this->load->view('admin/template/footer');
 	}
 
-    public function syncproductbid(){
-        echo "hi";
-    }
+    
+    public function bidwinner()
+	{
+        // $data['newsData'] = $this->m_news->getNewsData();
+        $data['data'] = $this->m_base->getOneToManyBidWinner('bid_winner', 'product_bid', 'product_id', 'id')->result_array();
+        $data['data'] = array_reverse($data['data']);
+
+        // print_r($data);
+        // die;
+
+        // print_r($data);
+        // die;
+        
+		$this->load->view('admin/template/header');
+		$this->load->view('admin/bidwinner_list',$data);
+		$this->load->view('admin/template/footer');
+	}
+
+
+   
 
 	public function create_news()
 	{
@@ -184,10 +203,10 @@ class Admin extends CI_Controller {
 
 	public function users()
 	{
-        $data['members'] = $this->m_admin->select_table('member');
+        $data['data'] = $this->db->get('user')->result_array();
 
 		$this->load->view('admin/template/header');
-		$this->load->view('admin/users_list',$data);
+		$this->load->view('admin/user_list',$data);
 		$this->load->view('admin/template/footer');
     }
     

@@ -19,12 +19,12 @@
                     <?php foreach ($data as $i) : ?>
                         <tr>
                             <td><?= $i['name'] ?></td>
-                            <td><?= $i['starting_price'] ?></td>
+                            <td><?= number_format($i['starting_price']) ?></td>
                             <td><?= $i['start_date'] ?></td>
                             <td><?= $i['end_date'] ?></td>
                             <td><?php if ($i['is_active'] == 1) : ?>
                                     <span class="badge badge-success">Approved</span>
-                                <?php elseif ($i['is_active'] === '0') : ?>
+                                <?php elseif ($i['is_active'] === '0' && $i['is_validated'] == 1) : ?>
                                     <span class="badge badge-danger">Not Approved</span>
                                 <?php else : ?>
                                     <span class="badge badge-warning">Checking In Progress</span>
@@ -41,7 +41,7 @@
                             <td><?php if ($i['highest_bid'] == 0 || $i['highest_bid'] == null) : ?>
                                     0
                                 <?php else : ?>
-                                    <?= $i['highest_bid'] ?>
+                                    <?= number_format($i['highest_bid']) ?>
                                 <?php endif; ?>
                             </td>
 

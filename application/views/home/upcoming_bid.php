@@ -18,6 +18,7 @@
     function numberWithCommas(x) {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
+
     onValue(productRef, (snapshot) => {
         var data = snapshot.val();
         var html = "";
@@ -27,16 +28,16 @@
             var dd = String(today.getDate()).padStart(2, '0');
             var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
             var yyyy = today.getFullYear();
-            today = yyyy + '-' + mm + '-' + dd;
+            today = yyyy + '-' +  mm + '-' + dd;
 
             var d1 = Date.parse(data[val].end_date);
             var d2 = Date.parse(today);
             var d3 = Date.parse(data[val].start_date);
             console.log(data);
+            
 
 
-
-            if (d3 <= d2 && d1 > d2) { //jika end date belum melewati hari ini dan start date sudah terlewat
+            if (d3 >= d2){//jika end date belum melewati hari ini dan start date sudah terlewat
                 html += `
                 <div class="col-sm-3" >
                     <div class="card"> <img src="${data[val].product_images}?alt=media" class="card-img-top img-thumbnail" width="300" height="300">
@@ -48,25 +49,13 @@
                                     </div>
                                     <hr class="mt-2 mx-3">
                                     <div class="d-flex flex-row justify-content-between px-3 pb-2">
-                                        <div class="d-flex flex-column"><span class="text-muted">Highest Bid:</span></div>
-                                        <div class="d-flex flex-column">
-                                            <h6>Rp.${numberWithCommas(data[val].highest_bid)}</h6>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex flex-row justify-content-between px-3 pb-2">
-                                        <div class="d-flex flex-column"><span class="text-muted">Total Bidder:</span></div>
-                                        <div class="d-flex flex-column">
-                                            <h6><strong>${data[val].total_bidder}</strong></h6>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex flex-row justify-content-between px-3 pb-2">
-                                        <div class="d-flex flex-column"><span class="text-muted">Time Left:</span></div>
-                                        <div class="d-flex flex-column" data-countdown="${data[val].end_date}">
+                                        <div class="d-flex flex-column"><span class="text-muted">Bid will start:</span></div>
+                                        <div class="d-flex flex-column" data-countdown="${data[val].start_date}">
                                             0d 0h 0m 0s
                                         </div>
                                     </div>
-                                    <div class="mx-3 mt-3 mb-2"><a href="<?= base_url() ?>product/detail/${val}" type="button" class="btn btn-danger btn-block"><small>
-                                                Detail
+                                    <div class="mx-3 mt-3 mb-2"><a href="<?= base_url() ?>product/detail/${val}" type="button" class="btn btn-danger btn-block disabled"><small>
+                                                Wait until the bid started
                                     </small></a></div>
                                     </div>
                                 </div>
@@ -109,7 +98,7 @@
                 // If the count down is finished, write some text
                 if (distance < 0) {
                     clearInterval(x);
-                    $this.html("EXPIRED");
+                    $this.html("Bid Is Started");
                 }
             }, 1000);
         });

@@ -5,26 +5,14 @@
             <section>
                 <form id="example-form">
                     <div class="form-group">
-                        <label for="exampleInputEmail1">NIK</label>
-                        <input id="nik" name="nik" type="number" class="form-control" placeholder="Enter NIK" required>
+                        <label for="exampleInputEmail1">NIM</label>
+                        <input id="nim" name="nim" type="number" class="form-control" placeholder="Enter NIM" required>
                         <small id="emailHelp" class="form-text text-muted">We'll never share your data with anyone else.</small>
                     </div>
                     <div class="form-group">
-                        <label for="exampleInputPassword1">Birth Date</label>
-                        <input id="date" name="date" type="date" class="form-control" placeholder="Birth Date" required>
+                        <label for="exampleInputPassword1">Full Name</label>
+                        <input id="fullname" name="fullname" type="text" class="form-control" placeholder="fullname" required>
                     </div>
-                    <div class="form-group">
-                        <label for="exampleInputPassword1">Your Picture</label>
-                        <input class="form-control-file" type="file" name="file" id="formFile">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="exampleInputPassword1">Picture Example:</label><br>
-                        <img src="<?= base_url() ?>assets/image_example.jpg" alt="..." class="img-thumbnail" width="20%">
-                    </div>
-
-
-
 
                     <button type="button" class="btn btn-success" id="validatebtn" onclick="validateKYC()">Validate</button>
 
@@ -67,14 +55,11 @@
                     minlength: 16
                 },
                 date: "required",
-                file: {
-                    required: true,
-                }
+            
             },
             messages: {
                 "nik": "Please enter your NIK (Min: 16)",
                 "date": "Please enter your Birth Date",
-                "file": "Please upload your Picture",
             }
         });
 
@@ -131,17 +116,18 @@
                 type: "POST",
                 data: formdata,
                 success: function(msg) {
-                    const response = JSON.parse(msg)
-                    console.log(response)
-                    if (response.data) {
-                        isValidated = true;
-                        $("#validatebtn").html(`Congrats! you're validated`)
-                        $("#validatebtn").prop('disabled', true)
-                    } else {
-                        $("#validatebtn").html(`Validated`)
-                        $("#validatebtn").prop('disabled', false)
-                    }
-                    alert(response.message)
+                    // const response = JSON.parse(msg)
+                    // console.log(response)
+                    // if (response.data) {
+                    //     isValidated = true;
+                    //     $("#validatebtn").html(`Congrats! you're validated`)
+                    //     $("#validatebtn").prop('disabled', true)
+                    // } else {
+                    //     $("#validatebtn").html(`Validated`)
+                    //     $("#validatebtn").prop('disabled', false)
+                    // }
+                    // alert(response.message)
+                    alert(msg)
                 },
                 cache: false,
                 contentType: false,
@@ -207,7 +193,7 @@
         },
         onFinished: function(event, currentIndex) {
             alert("Succesfuly Register!");
-            window.location.replace("<?=base_url()?>/login");
+            window.location.replace("<?=base_url()?>auth/login");
         }
     });
 </script>

@@ -33,7 +33,7 @@ class Home extends CI_Controller
         public function upcomingbid()
         {
                 $this->load->view('template/header_view.php');
-                // $this->load->view('home/finished_bid.php');
+                $this->load->view('home/upcoming_bid.php');
                 $this->load->view('template/footer_view.php');
         }
 
@@ -44,7 +44,8 @@ class Home extends CI_Controller
 
                 foreach ($products as $product) {
                         $today = date("Y-m-d");
-                        if ($product['end_date'] < $today) {
+                        // echo $product['end_date'] . $product['name'];
+                        if ($product['end_date'] <= $today) {
                                 $check = $this->m_base->countWhere('bid_winner', ['product_id' => $product['id']]);
                                 if ($check > 0) {
                                         $product['winner_announced'] = 1;
