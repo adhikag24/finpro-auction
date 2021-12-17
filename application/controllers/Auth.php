@@ -106,8 +106,6 @@ class Auth extends CI_Controller
       $response['message'] = 'Maaf NIM sudah terdaftar.';
       $jsonResponse = json_encode($response);
     } else {
-      echo $fullname;
-      echo $nim;
       $isUserVerified = $this->checkIfMahasiswaExist($fullname, $nim);
       // $birthDateInput =  $post['birthdate'];
       // $file = $_FILES["image"];
@@ -129,7 +127,7 @@ class Auth extends CI_Controller
 
 
       $response['data'] = $isUserVerified;
-      $response['message'] = $isUserVerified ? 'Selamat anda telah terverifikasi, dan dapat lanjut ke proses selanjutnya.' : 'Maaf anda belum terverifikasi, pastikan NIK, Tanggal Lahir benar, dan juga foto selfie yang jelas dan terang.';
+      $response['message'] = $isUserVerified ? 'Selamat anda telah terverifikasi, dan dapat lanjut ke proses selanjutnya.' : 'Maaf anda belum terverifikasi, pastikan NIM, dan Nama Panjang benar dan Lengkap.';
 
       $jsonResponse = json_encode($response);
     }
@@ -140,7 +138,6 @@ class Auth extends CI_Controller
   public function checkIfMahasiswaExist($name,$nim)
   {
     $equalTo = sprintf("%s(%s)", strtoupper($name), $nim);
-    echo $equalTo;
     $query = str_replace(" ", "%20", $name);
     $result = $this->curlDataMahasiswa($query);
     $data = json_decode($result, true);
@@ -193,7 +190,7 @@ class Auth extends CI_Controller
       'user_name' => $post['name'],
       'user_email' => $post['email'],
       'user_password' => md5($post['password']),
-      'nik' => $post['nik'],
+      'nim' => $post['nim'],
       'role' => 0,
     ];
 

@@ -11,7 +11,7 @@
                     </div>
                     <div class="form-group">
                         <label for="exampleInputPassword1">Full Name</label>
-                        <input id="fullname" name="fullname" type="text" class="form-control" placeholder="fullname" required>
+                        <input id="fullname" name="fullname" type="text" class="form-control" placeholder="Enter Fullname" required>
                     </div>
 
                     <button type="button" class="btn btn-success" id="validatebtn" onclick="validateKYC()">Validate</button>
@@ -104,30 +104,26 @@
             var data = formId.serializeArray();
 
             var formdata = new FormData();
-            jQuery.each($('#formFile')[0].files, function(i, file) {
-                formdata.append('image', file);
-            });
 
-            formdata.append('nik', data[0].value)
-            formdata.append('birthdate', data[1].value)
+            formdata.append('nim', data[0].value)
+            formdata.append('fullname', data[1].value)
 
             $.ajax({
                 url: "<?= base_url() ?>auth/kycverif",
                 type: "POST",
                 data: formdata,
                 success: function(msg) {
-                    // const response = JSON.parse(msg)
-                    // console.log(response)
-                    // if (response.data) {
-                    //     isValidated = true;
-                    //     $("#validatebtn").html(`Congrats! you're validated`)
-                    //     $("#validatebtn").prop('disabled', true)
-                    // } else {
-                    //     $("#validatebtn").html(`Validated`)
-                    //     $("#validatebtn").prop('disabled', false)
-                    // }
-                    // alert(response.message)
-                    alert(msg)
+                    const response = JSON.parse(msg)
+                    console.log(response)
+                    if (response.data) {
+                        isValidated = true;
+                        $("#validatebtn").html(`Congrats! you're validated`)
+                        $("#validatebtn").prop('disabled', true)
+                    } else {
+                        $("#validatebtn").html(`Validated`)
+                        $("#validatebtn").prop('disabled', false)
+                    }
+                    alert(response.message)
                 },
                 cache: false,
                 contentType: false,
@@ -144,13 +140,13 @@
     function registersend() {
         var form = $("#form-data");
         var data = form.serializeArray();
-        var nik = $("#nik").val()
+        var nim = $("#nim").val()
         var formdata = new FormData();
 
         formdata.append('name', data[0].value)
         formdata.append('email', data[1].value)
         formdata.append('password', data[2].value)
-        formdata.append('nik', nik)
+        formdata.append('nim', nim)
 
 
         $.ajax({
