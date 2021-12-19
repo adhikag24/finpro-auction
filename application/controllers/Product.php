@@ -72,7 +72,7 @@ class Product extends CI_Controller
 
                     unlink('./assets/image/' . $name);
 
-                    $image_url = 'https://firebasestorage.googleapis.com/v0/b/auction-website-1cc67.appspot.com/o/' . $uploadedName;
+                    $image_url = getenv("FB_STORAGE") . $uploadedName;
 
 
                     $daterange = explode('-', $post['daterange']);
@@ -127,7 +127,7 @@ class Product extends CI_Controller
         $this->load->view('template/footer_view.php');
     }
 
-    public function syncproductbid()
+    public function valproductbid()
     {
         $where = [
             'is_active' => 0,
@@ -207,28 +207,18 @@ class Product extends CI_Controller
 
     public function identifyBlurandObject($imageurl)
     {
-        /* API URL */
-        $url = 'http://127.0.0.1:5000/validate-image';
+        $url = getenv("PYTHON_VALIDATE_IMAGE");
 
-        /* Init cURL resource */
         $ch = curl_init($url);
 
-
-        /* Array Parameter Data */
         $data = ['image' => $imageurl];
 
-        /* pass encoded JSON string to the POST fields */
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-
-        /* execute request */
         $result = curl_exec($ch);
 
-
-
-        /* close cURL resource */
         curl_close($ch);
 
         return $result;

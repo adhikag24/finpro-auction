@@ -107,25 +107,6 @@ class Auth extends CI_Controller
       $jsonResponse = json_encode($response);
     } else {
       $isUserVerified = $this->checkIfMahasiswaExist($fullname, $nim);
-      // $birthDateInput =  $post['birthdate'];
-      // $file = $_FILES["image"];
-
-      // $dataNIK = $this->getAgeandGenderFromNIK($nik);
-      // $resultCurl = $this->identifyImageGenderAndAge($file);
-      // $responseCurl = json_decode($resultCurl, true);
-      // $ageRange = array();
-      // foreach ($responseCurl as $result) {
-        // $result['age'] = substr($result['age'], 1, -1);
-        // $numArr =  explode("-", $result['age']);
-        // array_push($ageRange, $numArr[0], $numArr[1]);
-      // }
-      // $minRange = min($ageRange);
-      // $maxRange = max($ageRange);
-
-      // $imageGender = $responseCurl[0]['gender'];
-      // $isUserVerified = $this->verifyUser($dataNIK['age'], $dataNIK['birthdate'], $birthDateInput, $minRange, $maxRange, $dataNIK['gender'], $imageGender);
-
-
       $response['data'] = $isUserVerified;
       $response['message'] = $isUserVerified ? 'Selamat anda telah terverifikasi, dan dapat lanjut ke proses selanjutnya.' : 'Maaf anda belum terverifikasi, pastikan NIM, dan Nama Panjang benar dan Lengkap.';
 
@@ -155,28 +136,16 @@ class Auth extends CI_Controller
 
   public function curlDataMahasiswa($query)
   {
-    /* API URL */
-    $url = 'https://api-frontend.kemdikbud.go.id/hit_mhs/' . $query;
+    $url = getenv("API_KEMENDIKBUD") . $query;
 
-    /* Init cURL resource */
     $ch = curl_init();
 
-
-    /* Array Parameter Data */
-
-    /* pass encoded JSON string to the POST fields */
     curl_setopt($ch, CURLOPT_URL, $url);
 
-    // return the transfer as a string 
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
-
-    /* execute request */
     $result = curl_exec($ch);
 
-
-
-    /* close cURL resource */
     curl_close($ch);
 
     return $result;
