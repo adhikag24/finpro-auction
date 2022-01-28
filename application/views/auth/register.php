@@ -1,7 +1,7 @@
 <div class="container justify-content-center">
     <div class="content">
         <div id="wizard" class="mt-3">
-            <h2>KYC Verification</h2>
+            <h2>NIM Verification</h2>
             <section>
                 <form id="example-form">
                     <div class="form-group">
@@ -120,7 +120,7 @@
                         $("#validatebtn").html(`Congrats! you're validated`)
                         $("#validatebtn").prop('disabled', true)
                     } else {
-                        $("#validatebtn").html(`Validated`)
+                        $("#validatebtn").html(`Validate`)
                         $("#validatebtn").prop('disabled', false)
                     }
                     alert(response.message)

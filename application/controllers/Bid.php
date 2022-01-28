@@ -33,7 +33,7 @@ class Bid extends CI_Controller
     public function syncbidwinner()
     {
         $products = $this->m_base->getWhere('product_bid', ['is_active' => 1])->result_array();
-
+        
         foreach ($products as $product) {
             $today = date("Y-m-d");
             if ($product['end_date'] <= $today) {

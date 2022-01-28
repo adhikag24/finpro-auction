@@ -2,6 +2,7 @@
     <h3 class="mb-3">Product List</h3>
     <div class="card">
         <div class="card-body">
+        <?= $this->session->flashdata('message'); ?>
             <table id="table_id" class="display">
                 <thead>
                     <tr>
@@ -13,6 +14,7 @@
                         <th>Total Bidder</th>
                         <th>Highest Bid</th>
                         <th>Image</th>
+                        <th>Cancel</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -37,7 +39,7 @@
                                 <?php endif; ?>
                             </td>
 
-                            
+
                             <td><?php if ($i['highest_bid'] == 0 || $i['highest_bid'] == null) : ?>
                                     0
                                 <?php else : ?>
@@ -45,8 +47,15 @@
                                 <?php endif; ?>
                             </td>
 
-                            <td> <img class="img" src="<?=$i['product_image']?>?alt=media" alt="" width="50" height="50"> </td>
-                           
+                            <td> <img class="img" src="<?= $i['product_image'] ?>?alt=media" alt="" width="50" height="50"> </td>
+                            <td>
+                                <?php if (array_key_exists('allow_delete', $i)) : ?>
+                                    <a href="<?= base_url()?>product/deleteproduct/<?=$i['id']?>" class="btn btn-warning">Delete Product</a>
+                                <?php else: ?>
+                                    <span class="btn btn-warning disabled">Delete Not Allowed</span>
+                                <?php endif; ?>
+                            </td>
+
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

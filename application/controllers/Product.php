@@ -43,7 +43,7 @@ class Product extends CI_Controller
         if (!empty($_FILES['product_image']['name'])) {
             $config['upload_path']          = './assets/image';
             $config['allowed_types']        = 'jpg|png|jpeg';
-            $config['max_size']             = 2000;
+            $config['max_size']             = 0;
             $config['max_width']            = 0;
             $config['max_height']           = 0;
             $config['overwrite']            = FALSE;
@@ -62,17 +62,18 @@ class Product extends CI_Controller
                     //upload to firebase
                     $defaultBucket = $this->firebaseConn->getStorage();
                     $name = $_FILES['product_image']['name'];
+                    $name = str_replace(' ', '_', $name);
 
 
                     $uploadedfile = fopen('./assets/image/' . $name, 'r');
-
+                    print_r($uploadedfile);
                     $uploadedName = $this->upload->data('raw_name') . time() . $this->upload->data('file_ext');
 
                     $defaultBucket->getBucket()->upload($uploadedfile, ['name' =>  $uploadedName]);
 
                     unlink('./assets/image/' . $name);
 
-                    $image_url = getenv("FB_STORAGE") . $uploadedName;
+                    $image_url = "https://firebasestorage.googleapis.com/v0/b/auction-website-1cc67.appspot.com/o/" . $uploadedName;
 
 
                     $daterange = explode('-', $post['daterange']);
@@ -104,16 +105,50 @@ class Product extends CI_Controller
     {
         $id = $this->session->userdata('id');
 
-        $product = $this->m_base->getDetail('product_bid', $id)->result_array();
-        // echo "<pre>";
-        // print_r($product);
-        $data['data'] = array_reverse($product);
-        // print_r($data);
-        // echo "</pre>";
+        $products = $this->m_base->getDetail('product_bid', $id)->result_array();
+        $data['data'] = array_reverse($products);
+        foreach ($data['data'] as $key => $product) {
+            $bidCount = $this->db->get_where('bid', ['product_id' => $product['id']])->num_rows();
+            if ($bidCount == 0) {
+                $data['data'][$key]['allow_delete'] = 1;
+            }
+        }
+
 
         $this->load->view('template/header_view.php');
         $this->load->view('my_product.php', $data);
         $this->load->view('template/footer_view.php');
+    }
+
+    public function deleteproduct($id)
+    {
+        $idInString = (string) $id;
+        $this->db->where('id', $id);
+        $this->db->delete('product_bid');    
+        /** 
+         * Check if data exist in firebase, if yes then remove it, if not then do nothing.
+         * 
+        */
+        $database = $this->firebaseConn->getDatabase();
+        $data = $database->getReference('products')
+            ->orderByChild('product_id')
+            ->equalTo($idInString)
+            ->getSnapshot()->getValue();
+
+        if(empty($data)){
+        
+        }else{
+            $key = array_key_first($data);
+            $reference = sprintf("products/%s",$key);
+       
+            $database->getReference($reference)->remove();
+        }
+
+        $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">
+        Congratulation! succesfuly delete product.
+        </div>');
+
+        redirect(base_url('product/myproduct'));
     }
 
     public function detail($productId)
@@ -127,7 +162,7 @@ class Product extends CI_Controller
         $this->load->view('template/footer_view.php');
     }
 
-    public function valproductbid()
+    public function syncproductbid()
     {
         $where = [
             'is_active' => 0,
@@ -142,7 +177,7 @@ class Product extends CI_Controller
             $userData = $this->db->get_where('user', ['id'  => $product['user_id']])->row_array();
 
             if ($resultCurl['is_approved']) {
-               
+
                 //send notification
                 $dataEmail = [
                     'to'    => $userData['user_email'],
@@ -170,9 +205,8 @@ class Product extends CI_Controller
                     "product_name" => $product['name'],
                     "total_bidder" => 0
                 ];
-                
-                $this->insertfirebase($firebaseProduct);
 
+                $this->insertfirebase($firebaseProduct);
             } else {
                 $dataEmail = [
                     'to'    => $userData['user_email'],
@@ -207,7 +241,7 @@ class Product extends CI_Controller
 
     public function identifyBlurandObject($imageurl)
     {
-        $url = getenv("PYTHON_VALIDATE_IMAGE");
+        $url = "http://127.0.0.1:5000/validate-image";
 
         $ch = curl_init($url);
 
@@ -229,7 +263,21 @@ class Product extends CI_Controller
     {
         $userid = $this->session->userdata('id');
         $post = $this->input->post();
-     
+
+        $userproductid = $this->db->get_where('product_bid', ['id' => $post['productId']])->row_array()['user_id'];
+
+        if ($userid == $userproductid) {
+            $responseFail = [
+                'message'    => "You cannot bid your own product",
+                'code'    => 201
+            ];
+
+            $responseFailJson = json_encode($responseFail);
+
+            echo $responseFailJson;
+            return;
+        }
+
         $where = [
             'user_id' => $userid,
             'product_id' => $post['productId']
@@ -274,7 +322,9 @@ class Product extends CI_Controller
         $this->db->update('product_bid', $productupdatedata);
 
         $response = [
-            'amount'    => $post['amount']
+            'message'   =>  'Succesfuly Place a Bid',
+            'amount'    => $post['amount'],
+            'code'      => 200
         ];
 
         $responseJson = json_encode($response);

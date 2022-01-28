@@ -180,9 +180,6 @@ $(document).ready(function() {
         var currentprice = $('#starting_price').val();
         var highestprice = $('#highest_bid').val();
         var fbid ="<?=$id?>"
-        console.log("masuk", amount);
-        console.log("masuk", currentprice);
-        console.log("masuk", highestprice);
         if (amount <= currentprice || amount <= highestprice) {
             alert("Amount, can't be lower than current price")
         } else {
@@ -191,12 +188,14 @@ $(document).ready(function() {
                 productId: productid,
                 productfbId: fbid
             }, function(data, status) {
-                if (status == "success") {
+                const obj = JSON.parse(data)
+                console.log(obj);
+                if (obj.code == 200) {
                     alert("Success Submit Bid");
                 } else {
-                    alert("Something Wrong Happen, Fail Submit Bid");
+                    alert(obj.message);
                 }
-                console.log(data, status);
+                console.log(obj, status);
             });
         }
 

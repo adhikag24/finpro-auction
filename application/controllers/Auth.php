@@ -136,7 +136,7 @@ class Auth extends CI_Controller
 
   public function curlDataMahasiswa($query)
   {
-    $url = getenv("API_KEMENDIKBUD") . $query;
+    $url = "https://api-frontend.kemdikbud.go.id/hit_mhs/" . $query;
 
     $ch = curl_init();
 
