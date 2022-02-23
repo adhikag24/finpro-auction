@@ -35,8 +35,8 @@ class Product extends CI_Controller
     {
         $post = $this->input->post();
 
-
         $this->form_validation->set_rules('product_name', 'Product Name', 'required|trim');
+        $this->form_validation->set_rules('product_description', 'Product Description', 'required|trim');
         $this->form_validation->set_rules('starting_price', 'Starting Price', 'required|trim');
         $this->form_validation->set_rules('daterange', 'End Date', 'required|trim');
 
@@ -83,6 +83,7 @@ class Product extends CI_Controller
                     $data = array(
                         'name' => $post['product_name'],
                         'starting_price' => $post['starting_price'],
+                        'description'   => $post['product_description'],
                         'start_date' => $startDate,
                         'end_date' => $endDate,
                         'user_id' => $this->session->userdata('id'),
@@ -111,6 +112,25 @@ class Product extends CI_Controller
             $bidCount = $this->db->get_where('bid', ['product_id' => $product['id']])->num_rows();
             if ($bidCount == 0) {
                 $data['data'][$key]['allow_delete'] = 1;
+            }
+        }
+
+         //check bid winner
+         foreach($data['data'] as $i => $productdata){
+            $getWinnerData = $this->db->get_where('bid_winner',['product_id' => $productdata['id']])->row_array();
+            if(!empty($getWinnerData)){
+                    $data['data'][$i]['status'] = '<span class="badge badge-success">Bid is finished!</span>';
+
+                    //get product owner id
+                    $bidWinnerId = $getWinnerData['user_id'];
+
+                    $bidWinnerData = $this->db->get_where('user',['id'=>$bidWinnerId])->row_array();
+                    $data['data'][$i]['bid_winner_info'] = sprintf("%s - %s",$bidWinnerData['user_name'],$bidWinnerData['user_email']);
+              
+            }else{
+                $data['data'][$i]['status'] = '<span class="badge badge-warning">Bid has not finish!</span>';
+                $data['data'][$i]['bid_winner_info'] = '-';
+
             }
         }
 
@@ -151,15 +171,25 @@ class Product extends CI_Controller
         redirect(base_url('product/myproduct'));
     }
 
-    public function detail($productId)
+    public function detail($productId,$productIdFirebase)
     {
         if ($this->session->userdata('is_login') != 1) {
             redirect('auth/login');
         }
-        $data['id'] = $productId;
+        $userid = $this->session->userdata('id');
+
+        $data['id'] = $productIdFirebase;
+        $data['userBid'] = $this->db->get_where('bid',['user_id' => $userid, 'product_id' => $productId])->row_array();
         $this->load->view('template/header_view.php');
         $this->load->view('detail_product.php', $data);
         $this->load->view('template/footer_view.php');
+    }
+
+    public function testEmail(){
+        $to = "adhikag167@gmail.com";
+        $subject = "TEst";
+        $body = "test lagi";
+        $this->m_base->sendemail($to, $subject, $body);
     }
 
     public function syncproductbid()
@@ -168,14 +198,16 @@ class Product extends CI_Controller
             'is_active' => 0,
             'is_validated' => 0
         ];
+
         $products = $this->db->get_where('product_bid', $where)->result_array();
 
         foreach ($products as $product) {
+            //sending request to python service
             $resultCurl = $this->identifyBlurandObject($product['product_image']);
             $resultCurl = json_decode($resultCurl, true);
 
             $userData = $this->db->get_where('user', ['id'  => $product['user_id']])->row_array();
-
+            //Check if it is approved
             if ($resultCurl['is_approved']) {
 
                 //send notification
@@ -184,30 +216,32 @@ class Product extends CI_Controller
                     'subject'   => 'Congratulations!, your product was validated and will be activated to the market.',
                     'body'      => sprintf("Hi %s, congratulations your product (%s), will go market at %s.", $userData['user_name'], $product['name'], $product['start_date'])
                 ];
-
+                //send notification to the user
                 $this->m_base->sendemail($dataEmail['to'], $dataEmail['subject'], $dataEmail['body']);
 
                 $changes = [
                     'is_active' => 1,
                     'is_validated' => 1
                 ];
-
+                //update the data in the database
                 $this->db->where('id', $product['id']);
                 $this->db->update('product_bid', $changes);
 
                 $firebaseProduct = [
+                    "product_name" => $product['name'],
                     "end_date" => $product['end_date'],
                     "start_date" => $product['start_date'],
+                    "description" => $product['description'],
                     "highest_bid" => 0,
                     "initial_price" => $product['starting_price'],
                     "product_id" => $product['id'],
                     "product_images" => $product['product_image'],
-                    "product_name" => $product['name'],
                     "total_bidder" => 0
                 ];
-
+                //insert the product data into firebase
                 $this->insertfirebase($firebaseProduct);
             } else {
+                //send notification
                 $dataEmail = [
                     'to'    => $userData['user_email'],
                     'subject'   => 'Unfortunately!, your product was not validated.',
@@ -216,6 +250,7 @@ class Product extends CI_Controller
 
                 $this->m_base->sendemail($dataEmail['to'], $dataEmail['subject'], $dataEmail['body']);
 
+                //update data in database
                 $changes = [
                     'is_validated' => 1
                 ];
@@ -241,6 +276,8 @@ class Product extends CI_Controller
 
     public function identifyBlurandObject($imageurl)
     {
+        //sending request to python service using curl
+        
         $url = "http://127.0.0.1:5000/validate-image";
 
         $ch = curl_init($url);

@@ -21,9 +21,35 @@ class Bid extends CI_Controller
     public function mybid()
     {
         $id = $this->session->userdata('id');
-        $condition = array('id' => $id);
+        $condition = array('bid.user_id' => $id);
 
         $bid['data'] = $this->m_base->getOneToMany('bid', 'product_bid', 'product_id', 'id', $condition)->result_array();
+     
+        //check bid winner
+        foreach($bid['data'] as $i => $data){
+            $getWinnerData = $this->db->get_where('bid_winner',['product_id' => $data['product_id']])->row_array();
+            if(!empty($getWinnerData)){
+                if($getWinnerData['user_id'] == $id){
+                    $bid['data'][$i]['status'] = '<span class="badge badge-success">You Win!</span>';
+
+                    //get product owner id
+                    $productOwnerId = $this->db->get_where('product_bid',['id'=>$data['product_id']])->row_array()['user_id'];
+
+                     $productOwnerData = $this->db->get_where('user',['id'=>$productOwnerId])->row_array();
+                     $bid['data'][$i]['product_owner_info'] = sprintf("%s - %s",$productOwnerData['user_name'],$productOwnerData['user_email']);
+                }else{
+                    $bid['data'][$i]['status'] = '<span class="badge badge-danger">Unfortunately you are not the winner!</span>';
+                    $bid['data'][$i]['product_owner_info'] = '-';
+
+                }
+            }else{
+                $bid['data'][$i]['status'] = '<span class="badge badge-warning">Bid has not finish!</span>';
+                $bid['data'][$i]['product_owner_info'] = '-';
+
+            }
+        }
+
+        
 
         $this->load->view('template/header_view.php');
         $this->load->view('my_bid.php', $bid);

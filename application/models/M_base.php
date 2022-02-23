@@ -39,7 +39,7 @@ class M_base extends CI_Model
     {
         $this->db->select('*');
         $this->db->from($table1);
-        if (isset($where)) {
+        if (isset($condition)) {
             $this->db->where($condition);
         }
         $this->db->join($table2, $table2 . '.' . $connection2 . '=' . $table1 . '.' . $connection1);
@@ -83,7 +83,7 @@ class M_base extends CI_Model
         $config['smtp_host']    = 'ssl://smtp.gmail.com';
         $config['smtp_port']    = '465';
         $config['smtp_timeout'] = '7';
-        $config['smtp_user']    = 'scapedigi@gmail.com';
+        $config['smtp_user']    = 'noreplyauctionsproject@gmail.com';
         $config['smtp_pass']    = 'raikage12345';
         $config['charset']    = 'iso-8859-1';
         $config['newline']    = "\r\n";
@@ -92,7 +92,7 @@ class M_base extends CI_Model
 
         $this->email->initialize($config);
 
-        $this->email->from('scapedigi@gmail.com', 'Auction Finpro');
+        $this->email->from('noreplyauctionsproject@gmail.com', 'Auction Finpro');
         $this->email->to($target); 
 
         $this->email->subject($subject);

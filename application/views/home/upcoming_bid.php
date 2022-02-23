@@ -40,7 +40,7 @@
             if (d3 >= d2){//jika end date belum melewati hari ini dan start date sudah terlewat
                 html += `
                 <div class="col-sm-3" >
-                    <div class="card"> <img src="${data[val].product_images}?alt=media" class="card-img-top img-thumbnail" width="300" height="300">
+                    <div class="card"> <img src="${data[val].product_images}?alt=media" class="card-img-top img-thumbnail" style="width: 300px; height: 300px; object-fit:cover;">
                                 <div class="card-body pt-0 px-0">
                                     <div class="mt-3 text-center" >${data[val].product_name}</div>
 

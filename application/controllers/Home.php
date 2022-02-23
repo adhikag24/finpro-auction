@@ -17,28 +17,26 @@ class Home extends CI_Controller
 
         public function index()
         {
-                // $newdata = array( 
-                //     'username'  => 'johndoe', 
-                //     'email'     => 'johndoe@some-site.com', 
-                //     'logged_in' => TRUE
-                //  );  
+                $data['section'] = 'home';
 
-                // $this->session->set_userdata($newdata);
-
-                $this->load->view('template/header_view.php');
+                $this->load->view('template/header_view.php',$data);
                 $this->load->view('home/home.php');
                 $this->load->view('template/footer_view.php');
         }
 
         public function upcomingbid()
         {
-                $this->load->view('template/header_view.php');
+                $data['section'] = 'upcomingBid';
+
+                $this->load->view('template/header_view.php',$data);
                 $this->load->view('home/upcoming_bid.php');
                 $this->load->view('template/footer_view.php');
         }
 
         public function finishedbid()
         {
+                $data['section'] = 'finishedBid';
+
                 $products = $this->m_base->getWhere('product_bid', ['is_active' => 1])->result_array();
                 $data['data'] = array();
 
@@ -58,7 +56,7 @@ class Home extends CI_Controller
 
 
 
-                $this->load->view('template/header_view.php');
+                $this->load->view('template/header_view.php', $data);
                 $this->load->view('home/finished_bid.php', $data);
                 $this->load->view('template/footer_view.php');
         }

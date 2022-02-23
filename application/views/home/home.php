@@ -39,7 +39,7 @@
             if (d3 <= d2 && d1 > d2) { //jika end date belum melewati hari ini dan start date sudah terlewat
                 html += `
                 <div class="col-sm-3" >
-                    <div class="card"> <img src="${data[val].product_images}?alt=media" class="card-img-top img-thumbnail" width="300" height="300">
+                    <div class="card"> <img src="${data[val].product_images}?alt=media" class="card-img-top img-thumbnail"  style="width: 300px; height: 300px; object-fit:cover;">
                                 <div class="card-body pt-0 px-0">
                                     <div class="mt-3 text-center" >${data[val].product_name}</div>
 
@@ -65,7 +65,7 @@
                                             0d 0h 0m 0s
                                         </div>
                                     </div>
-                                    <div class="mx-3 mt-3 mb-2"><a href="<?= base_url() ?>product/detail/${val}" type="button" class="btn btn-danger btn-block"><small>
+                                    <div class="mx-3 mt-3 mb-2"><a href="<?= base_url() ?>product/detail/${data[val].product_id}/${val}" type="button" class="btn btn-danger btn-block"><small>
                                                 Detail
                                     </small></a></div>
                                     </div>

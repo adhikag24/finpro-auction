@@ -35,7 +35,7 @@
 
     <div id="nav">
         <nav class="container navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="<?php echo base_url(); ?>">Logo Here</a>
+            <a class="navbar-brand" href="<?php echo base_url(); ?>">      <img src="<?= base_url() ?>assets/image/other/logo.jpg" width="25%" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8"></a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -45,16 +45,22 @@
                     <!-- <router-link to="/" class="nav-item nav-link">Home</router-link> -->
                     <!-- <router-link to="my-bid" class="nav-item nav-link">My Bid</router-link> -->
                 </div>
+                <?php if (empty($section)):  
+                    
+                    $section = "";?>
+                   
+                <?php endif;?>
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= base_url() ?>">Ongoing Bid</a>
+                        <a class="nav-link <?= $section == "home" ? 'active' : ''; ?>" href="<?= base_url() ?>" width="150px">Ongoing Bid</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= base_url() ?>home/upcomingbid">Upcoming Bid</a>
+                        <a class="nav-link <?= $section == "upcomingBid" ? 'active' : ''; ?>" href="<?= base_url() ?>home/upcomingbid">Upcoming Bid</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= base_url() ?>home/finishedbid">Finished Bid</a>
+                        <a class="nav-link <?= $section == "finishedBid" ? 'active' : ''; ?>" href="<?= base_url() ?>home/finishedbid">Finished Bid</a>
                     </li>
+                    
                 </ul>
                 <div class="container">
                     <div class="row height d-flex justify-content-center align-items-center">
@@ -72,9 +78,13 @@
                                         <?= $this->session->userdata('name') ?>
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <?php  if($this->session->userdata('role') == 1):?>
+                                        <a class="dropdown-item" href="<?= base_url() ?>admin">Admin Page</a>
+                                        <?php else: ?>
                                         <a class="dropdown-item" href="<?= base_url() ?>product/requestproduct">Request Product</a>
                                         <a class="dropdown-item" href="<?= base_url() ?>product/myproduct">My Product</a>
                                         <a class="dropdown-item" href="<?= base_url() ?>bid/mybid">My Bids</a>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                                 <div>
