@@ -285,54 +285,32 @@ class Auth extends CI_Controller
     return '<span class="error">Invalid</span>';
   }
 
-  public function kode_provinsi($i)
-  {
-    $i = intval($i);
-    $data = array(
-      11 => 'Aceh',
-      12 => 'Sumatera Utara',
-      13 => 'Sumatera Barat',
-      14 => 'Riau',
-      15 => 'Jambi',
-      16 => 'Sumatera Selatan',
-      17 => 'Bengkulu',
-      18 => 'Lampung',
-      19 => 'Kep. Bangka Belitung',
-      21 => 'Kep. Riau',
-      31 => 'DKI Jakarta',
-      32 => 'Jawa Barat',
-      33 => 'Jawa Tengah',
-      34 => 'Yogyakarta',
-      35 => 'Jawa Timur',
-      36 => 'Banten',
-      51 => 'Bali',
-      52 => 'Nusa Tenggara Barat',
-      53 => 'Nusa Tenggara Timur',
-      61 => 'Kalimantan Barat',
-      62 => 'Kalimantan Tengah',
-      63 => 'Kalimantan Selatan',
-      64 => 'Kalimantan Timur',
-      71 => 'Sulawesi Utara',
-      72 => 'Sulawesi Tengah',
-      73 => 'Sulawesi Selatan',
-      74 => 'Sulawesi Tenggara',
-      75 => 'Gorontalo',
-      76 => 'Sulawesi Barat',
-      81 => 'Maluku',
-      82 => 'Maluku Utara',
-      91 => 'Papua Barat',
-      94 => 'Papua'
-    );
-    if (isset($data[$i])) {
-      return trim($data[$i]);
-    }
-    return '<span class="error">Invalid</span>';
-  }
-
-
   public function logout()
   {
     $this->session->sess_destroy();
     redirect(base_url());
   }
+
+  public function forgot_password(){
+    $this->load->view('auth/forgot_password');
+  }
+
+  public function forgot_password_process(){
+    $post = $this->input->post();
+
+    $dataUpdate = [
+      'user_password' => md5($post['password'])
+    ];
+    
+    $this->db->where('user_email', $post['email']);
+    $this->db->update('user', $dataUpdate);
+
+    $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">
+    Congratulation! you successfully change your password. Go Login!.
+    </div>');
+
+  redirect(base_url('auth/login'));
+
+  }
+
 }

@@ -13,6 +13,7 @@
                         <label for="exampleInputPassword1">Full Name</label>
                         <input id="fullname" name="fullname" type="text" class="form-control" placeholder="Enter Fullname" required>
                     </div>
+  
 
                     <button type="button" class="btn btn-success" id="validatebtn" onclick="validateKYC()">Validate</button>
 
@@ -34,6 +35,10 @@
                         <label>Password</label>
                         <input type="password" class="form-control" id="password" name="password" placeholder="Password">
                     </div>
+                    <div class="mb-3">
+  <label for="formFile" class="form-label">KTP</label>
+  <input class="form-control" type="file" id="formFile">
+</div>
                 </form>
             </section>
         </div>
