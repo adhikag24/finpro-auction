@@ -6,12 +6,16 @@ defined('BASEPATH') or exit('No direct script access allowed');
 class Auth extends CI_Controller
 {
 
+  public $firebaseConn;
+
   public function __construct()
   {
     parent::__construct();
     $this->load->library('form_validation');
+    $this->load->library('firebase');
     $this->load->model('m_auth');
     $this->load->model('m_base');
+    $this->firebaseConn = $this->firebase->init();
   }
 
 
@@ -55,6 +59,23 @@ class Auth extends CI_Controller
     $this->load->view('auth/login');
   }
 
+  public function verify($id)
+  {
+
+    $dataUpdate = [
+      'is_verified' => 1
+    ];
+
+    $this->db->where('id', $id);
+    $this->db->update('user', $dataUpdate);
+
+    $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">
+    Done! verify user.
+    </div>');
+
+    redirect(base_url('admin/users'));
+  }
+
   public function login_process()
   {
 
@@ -69,7 +90,18 @@ class Auth extends CI_Controller
       $email = $post['email'];
       $password = $post['password'];
 
+
+
       $validate = $this->m_auth->validateLogin($email, $password);
+
+      //check user is active
+      if ($validate['is_verified'] == 0) {
+        $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">
+        Your account has not been verified
+        </div>');
+        redirect('auth/login');
+      }
+
 
       if ($validate) {
         $data = [
@@ -116,7 +148,7 @@ class Auth extends CI_Controller
     echo $jsonResponse;
   }
 
-  public function checkIfMahasiswaExist($name,$nim)
+  public function checkIfMahasiswaExist($name, $nim)
   {
     $equalTo = sprintf("%s(%s)", strtoupper($name), $nim);
     $query = str_replace(" ", "%20", $name);
@@ -155,17 +187,53 @@ class Auth extends CI_Controller
   {
     $post = $this->input->post();
 
-    $data = [
-      'user_name' => $post['name'],
-      'user_email' => $post['email'],
-      'user_password' => md5($post['password']),
-      'nim' => $post['nim'],
-      'role' => 0,
-    ];
+    if (!empty($_FILES['ktp']['name'])) {
+      $config['upload_path']          = './assets/image';
+      $config['allowed_types']        = 'jpg|png|jpeg';
+      $config['max_size']             = 0;
+      $config['max_width']            = 0;
+      $config['max_height']           = 0;
+      $config['overwrite']            = FALSE;
+      $config['remove_spaces']        = TRUE;
 
-    $this->m_base->insertTable('user', $data);
+      $this->load->library('upload', $config);
 
-    echo "success";
+      if (!$this->upload->do_upload('ktp')) {
+        print_r($this->upload->display_errors());
+        $this->registration();
+      } else {
+        //upload to firebase
+        $defaultBucket = $this->firebaseConn->getStorage();
+        $name = $_FILES['ktp']['name'];
+        $name = str_replace(' ', '_', $name);
+
+
+        $uploadedfile = fopen('./assets/image/' . $name, 'r');
+        $uploadedName = $this->upload->data('raw_name') . time() . $this->upload->data('file_ext');
+
+        $defaultBucket->getBucket()->upload($uploadedfile, ['name' =>  $uploadedName]);
+
+        unlink('./assets/image/'. $name);
+
+        $image_url = "https://firebasestorage.googleapis.com/v0/b/auction-website-1cc67.appspot.com/o/" . $uploadedName;
+
+        $data = [
+          'user_name' => $post['name'],
+          'user_email' => $post['email'],
+          'user_password' => md5($post['password']),
+          'nim' => $post['nim'],
+          'role' => 0,
+          'ktp' => $image_url,
+          'is_verified' => 1
+        ];
+
+        $this->m_base->insertTable('user', $data);
+
+        echo "success";
+      }
+    }
+
+    echo "KTP is required";
   }
 
   public function verifyUser($age, $birthDateNIK, $birthDateInput, $min, $max, $genderNIK, $genderImage)
@@ -291,17 +359,19 @@ class Auth extends CI_Controller
     redirect(base_url());
   }
 
-  public function forgot_password(){
+  public function forgot_password()
+  {
     $this->load->view('auth/forgot_password');
   }
 
-  public function forgot_password_process(){
+  public function forgot_password_process()
+  {
     $post = $this->input->post();
 
     $dataUpdate = [
       'user_password' => md5($post['password'])
     ];
-    
+
     $this->db->where('user_email', $post['email']);
     $this->db->update('user', $dataUpdate);
 
@@ -309,8 +379,6 @@ class Auth extends CI_Controller
     Congratulation! you successfully change your password. Go Login!.
     </div>');
 
-  redirect(base_url('auth/login'));
-
+    redirect(base_url('auth/login'));
   }
-
 }

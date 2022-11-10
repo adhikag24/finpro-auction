@@ -1,4 +1,5 @@
 <?php
+ob_start();
 defined('BASEPATH') or exit('No direct script access allowed');
 
 class Product extends CI_Controller
@@ -320,6 +321,7 @@ class Product extends CI_Controller
             'product_id' => $post['productId']
         ];
 
+        date_default_timezone_set("Asia/Jakarta");
         $alreadyBidProduct = $this->m_base->getWhere('bid', $where);
         if (empty($alreadyBidProduct->row())) {
             $data = [
@@ -328,7 +330,16 @@ class Product extends CI_Controller
                 'amount' => $post['amount']
             ];
 
+          
+            $dataHistory = array (
+                'user_id' => $userid,
+                'product_id' => $post['productId'],
+                'amount' => $post['amount'],
+                'created_at' => date("Y-m-d h:i:sa")
+            );
+
             $this->m_base->insertTable('bid', $data);
+            $this->m_base->insertTable('bid_history', $dataHistory);
         } else {
             $data = array(
                 'amount' => $post['amount']
@@ -336,6 +347,16 @@ class Product extends CI_Controller
 
             $this->db->where($where);
             $this->db->update('bid', $data);
+
+            $dataHistory = array (
+                'user_id' => $userid,
+                'product_id' => $post['productId'],
+                'amount' => $post['amount'],
+                'created_at' => date("Y-m-d h:i:sa")
+            );
+
+            $this->m_base->insertTable('bid_history', $dataHistory);
+
         }
 
         $count = $this->m_base->countWhere('bid', ['product_id' => $post['productId']]);

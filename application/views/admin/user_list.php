@@ -4,12 +4,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Bid Management</h1>
+                    <h1>Users Management</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active">User Management</li>
+                        <li class="breadcrumb-item active">Users Management</li>
                     </ol>
                 </div>
             </div>
@@ -41,6 +41,9 @@
                                         <th>User Name</th>
                                         <th>Email</th>
                                         <th>Role</th>
+                                        <th>KTP</th>
+                                        <th>Is Verified</th>
+                                        <th>Verify</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -49,6 +52,13 @@
                                             <td><?= $i['user_name'] ?></td> 
                                             <td><?= $i['user_email'] ?></td>
                                             <td><?= ($i['role'] == 0) ? "Member" : "Admin"  ?></td>
+                                            <td><img src=<?= $i['ktp'] . "?alt=media" ?> ></td>
+                                            <td><?= ($i['is_verified'] == 0) ? "Not Active" : "Active"  ?></td>
+                                            <?php if ($i['is_verified'] == 0 ): ?>
+                                                <td><a href="<?= base_url()."auth/verify/".$i["id"] ?>"  class="btn btn-warning" role="button">Verify User</a></td>
+                                            <?php else: ?>
+                                                <td>  User Already Verified
+                                            <?php endif; ?>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>

@@ -47,9 +47,11 @@ class Bid extends CI_Controller
                 $bid['data'][$i]['product_owner_info'] = '-';
 
             }
+
+            $history = $this->db->get_where('bid_history',['product_id'=>$data['product_id'], 'user_id' => $id])->result_array();
+            $bid['data'][$i]['history'] = array_reverse($history);
         }
 
-        
 
         $this->load->view('template/header_view.php');
         $this->load->view('my_bid.php', $bid);

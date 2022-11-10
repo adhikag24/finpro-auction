@@ -32,7 +32,7 @@
                                     <a href="<?=base_url()?>bid/syncbidwinner" onclick="return confirm('This Button will run function to validate all bid winner and send the notification. Are you sure?');" class="btn btn-sm btn-warning"><i class="fa fa-sync"></i> Sync Bid Winner</a>
                                 </div>
                             </h5>
-                            <?= $this->session->userdata('message'); ?>
+                            <?= $this->session->userdata('message'); ?> 
                         </div>
                         <div class="card-body">
                             <table id="example1" class="table table-bordered table-striped">

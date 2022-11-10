@@ -36,9 +36,9 @@
                         <input type="password" class="form-control" id="password" name="password" placeholder="Password">
                     </div>
                     <div class="mb-3">
-  <label for="formFile" class="form-label">KTP</label>
-  <input class="form-control" type="file" id="formFile">
-</div>
+                    <label for="formFile" class="form-label">KTP</label>
+                    <input class="form-control" type="file" id="ktp" name="ktp">
+                    </div>
                 </form>
             </section>
         </div>
@@ -148,10 +148,13 @@
         var nim = $("#nim").val()
         var formdata = new FormData();
 
+        console.log(data)
+
         formdata.append('name', data[0].value)
         formdata.append('email', data[1].value)
         formdata.append('password', data[2].value)
         formdata.append('nim', nim)
+        formdata.append('ktp',$('input[type=file]')[0].files[0])
 
 
         $.ajax({
